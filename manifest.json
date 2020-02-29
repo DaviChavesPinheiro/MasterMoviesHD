@@ -14,5 +14,14 @@
             "run_at": "document_end"
         }
     ],
-    "permissions" : ["bookmarks"]
+    "permissions" : ["bookmarks"],
+    "icons": {
+        "16": "Icon.png",
+        "48": "Icon.png",
+        "128": "Icon.png"
+    },
+    "browser_action": {
+        "default_title": "MasterFilmesHD",
+        "default_popup": "popup.html"
+    }
 }
