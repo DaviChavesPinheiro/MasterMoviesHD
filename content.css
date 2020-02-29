@@ -1,0 +1,42 @@
+#decodeBtn{
+    direction: ltr;
+    border: none;
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+    text-align: center;
+    font-size: 100%;
+    font-family: 'Roboto', 'Noto', sans-serif;
+    line-height: inherit;
+    outline: 0;
+    opacity: .9;
+    display: inline-block;
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+    vertical-align: top;
+    padding: 0px 6px;
+}
+
+#decodeBtn::after{
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 2px;
+    height: 9px;
+    width: 13px;
+    background-color: #f00;
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    line-height: normal;
+}
+
+#decodeBtn.decoded::after{
+    background-color: rgb(0, 214, 18);
+}
+
+#canvas.hidden{
+    display: none;
+}
