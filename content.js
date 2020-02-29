@@ -29,18 +29,14 @@ function decode() {
     var canvas;
     GetCanvas();
 
-    var back = document.createElement('canvas');
-    var backcontext = back.getContext('2d');
+    var _back = document.createElement('canvas');
+    var backcontext = _back.getContext('2d');
 
     video.onplay = onPlay;
     video.onpause = onPause;
     video.onresize = ReSizeCanvas;
 
     var ctx = canvas.getContext('2d');
-    var drawImgRect1;
-    var drawImgRect2;
-    var drawImgRect3;
-    var drawImgRect4;
     var idata;
     var data;
 
@@ -93,10 +89,11 @@ function decode() {
         canvas.height = cHeigth = video.clientHeight;
         vHeigth = video.videoHeight;
         vWidth = video.videoWidth;
-        back.width = cWidth;
-        back.height = cHeigth;
+        _back.width = cWidth;
+        _back.height = cHeigth;
         canvas.style.left = video.style.left;
 
+        update()
         console.log(cWidth, cHeigth, vWidth, vHeigth)
     }
 }
