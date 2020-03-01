@@ -48,11 +48,23 @@ function decode() {
         backcontext.drawImage(video, 0, 0, cWidth, cHeigth)
         idata = backcontext.getImageData(0,0,cWidth,cHeigth);
         data = idata.data;
+        // console.log(data)
         const sizeBy2 = data.length / 2;
+        const widthX4 = cWidth * 4
+        const widthX4By2 = widthX4 / 2
+        console.log(widthX4, widthX4By2)
         for(var i = 0; i < sizeBy2; i+=4) {
             [data[i], data[i + sizeBy2]] = [data[i + sizeBy2], data[i]];
             [data[i + 1], data[i + 1 + sizeBy2]] = [data[i + 1 + sizeBy2], data[i + 1]];
             [data[i + 2], data[i + 2 + sizeBy2]] = [data[i + 2 + sizeBy2], data[i + 2]];
+        }
+
+        for (let y = 0; y < cHeigth; y++) {
+            for (let x = 0; x < widthX4By2; x+=4) {
+                [data[x + widthX4 * y], data[x + widthX4By2 + widthX4 * y]] = [data[x + widthX4By2 + widthX4 * y], data[x + widthX4 * y]];
+                [data[x + widthX4 * y + 1], data[x + widthX4By2 + widthX4 * y + 1]] = [data[x + widthX4By2 + widthX4 * y + 1], data[x + widthX4 * y + 1]];
+                [data[x + widthX4 * y + 2], data[x + widthX4By2 + widthX4 * y + 2]] = [data[x + widthX4By2 + widthX4 * y + 2], data[x + widthX4 * y + 2]];
+            }
         }
         idata.data = data;
         ctx.putImageData(idata,0,0);
