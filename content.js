@@ -26,6 +26,8 @@ function decode() {
     var vHeigth = video.videoHeight;
     var vWidth = video.videoWidth;
 
+    var drawImgRect1, drawImgRect2, drawImgRect3, drawImgRect4;
+
     var canvas;
     GetCanvas();
 
@@ -45,29 +47,10 @@ function decode() {
     onPlay()
     
     function update(){
-        backcontext.drawImage(video, 0, 0, cWidth, cHeigth)
-        idata = backcontext.getImageData(0,0,cWidth,cHeigth);
-        data = idata.data;
-        // console.log(data)
-        const sizeBy2 = data.length / 2;
-        const widthX4 = cWidth * 4
-        const widthX4By2 = widthX4 / 2
-        console.log(widthX4, widthX4By2)
-        for(var i = 0; i < sizeBy2; i+=4) {
-            [data[i], data[i + sizeBy2]] = [data[i + sizeBy2], data[i]];
-            [data[i + 1], data[i + 1 + sizeBy2]] = [data[i + 1 + sizeBy2], data[i + 1]];
-            [data[i + 2], data[i + 2 + sizeBy2]] = [data[i + 2 + sizeBy2], data[i + 2]];
-        }
-
-        for (let y = 0; y < cHeigth; y++) {
-            for (let x = 0; x < widthX4By2; x+=4) {
-                [data[x + widthX4 * y], data[x + widthX4By2 + widthX4 * y]] = [data[x + widthX4By2 + widthX4 * y], data[x + widthX4 * y]];
-                [data[x + widthX4 * y + 1], data[x + widthX4By2 + widthX4 * y + 1]] = [data[x + widthX4By2 + widthX4 * y + 1], data[x + widthX4 * y + 1]];
-                [data[x + widthX4 * y + 2], data[x + widthX4By2 + widthX4 * y + 2]] = [data[x + widthX4By2 + widthX4 * y + 2], data[x + widthX4 * y + 2]];
-            }
-        }
-        idata.data = data;
-        ctx.putImageData(idata,0,0);
+        ctx.drawImage(video, drawImgRect1[0], drawImgRect1[1], drawImgRect1[2], drawImgRect1[3], drawImgRect1[4], drawImgRect1[5], drawImgRect1[6], drawImgRect1[7]);
+        ctx.drawImage(video, drawImgRect2[0], drawImgRect2[1], drawImgRect2[2], drawImgRect2[3], drawImgRect2[4], drawImgRect2[5], drawImgRect2[6], drawImgRect2[7]);
+        ctx.drawImage(video, drawImgRect3[0], drawImgRect3[1], drawImgRect3[2], drawImgRect3[3], drawImgRect3[4], drawImgRect3[5], drawImgRect3[6], drawImgRect3[7]);
+        ctx.drawImage(video, drawImgRect4[0], drawImgRect4[1], drawImgRect4[2], drawImgRect4[3], drawImgRect4[4], drawImgRect4[5], drawImgRect4[6], drawImgRect4[7]);
     }
 
 
@@ -105,7 +88,12 @@ function decode() {
         _back.height = cHeigth;
         canvas.style.left = video.style.left;
 
-        update()
         console.log(cWidth, cHeigth, vWidth, vHeigth)
+        drawImgRect1 = [0, 0, Math.ceil(vWidth / 2),  Math.ceil(vHeigth / 2), Math.floor(cWidth / 2 ), Math.floor(cHeigth / 2), Math.ceil(cWidth / 2), Math.ceil(cHeigth / 2)];
+        drawImgRect2 = [Math.ceil(vWidth / 2), 0, Math.floor(vWidth / 2), Math.ceil(vHeigth / 2), 0, Math.floor(cHeigth / 2) , Math.floor(cWidth / 2), Math.ceil(cHeigth / 2)];
+        drawImgRect3 = [0, Math.ceil(vHeigth / 2), Math.ceil(vWidth / 2), Math.floor(vHeigth / 2), Math.floor(cWidth / 2), 0 , Math.ceil(cWidth / 2), Math.floor(cHeigth / 2)];
+        drawImgRect4 = [Math.ceil(vWidth / 2), Math.ceil(vHeigth / 2), Math.floor(vWidth / 2), Math.floor(vHeigth / 2), 0, 0, Math.floor(cWidth / 2), Math.floor(cHeigth / 2)];
+        
+        update()
     }
 }
