@@ -18,10 +18,13 @@ function buttonClicked() {
 }
 
 function decode() {
-    var URL_Player1 = "KSw37-FGRXY";
-    var URL_Player2 = "YcVaIl2u3Fc";
-    var URLS_player3 = ["i9RJXgYBwWw", "gbuiF1Mfaqs", "Eix4yK52tnk", "Z2u-vjReuxA", "0PhlC81gLL4", "ehabhAQdkD4", "ZXh3-MPPjZE", "rwY2eLY0X-c", "exj9fH3Gm-c", "ShpJvAO5AAE", "dX3rWRXFj2I", "eOVM2AhfWaY", "SuJEWt7PC7Y", "0BqUYg2q1_8", "gEb8kE4xs3Q", "-mnpLci8JDY", "bkZV8qVS86A", "jxf4fToKMlg", "F6xc6WSocJ0", "9q98rLTsdGw", "3fSaxNNJIt8", "ye2RkbJCK4Y", "cphHXGA90BI", "kxEjiGn6Hvk", "8IFyclCUa2I", "pj-6-Vis8Bc", "3Uww_vi_b18", "RMG9LzMCefc", "yn6D5pfIwtQ", "sbxoHZA8nGQ", "1hTSl21Z7bo"];
-    var tempoDeInicioP3 = [60 * 5 * 0, 60 * 5 * 1, 60 * 5 * 2, 60 * 5 * 3, 60 * 5 * 4, 60 * 5 * 5, 60 * 5 * 6, 60 * 5 * 7, 60 * 5 * 8, 60 * 5 * 9, 60 * 5 * 10, 60 * 5 * 11, 60 * 5 * 12, 60 * 5 * 13, 60 * 5 * 14, 60 * 5 * 15, 60 * 5 * 16, 60 * 5 * 17, 60 * 5 * 18, 60 * 5 * 19, 60 * 5 * 20, 60 * 5 * 21, 60 * 5 * 22, 60 * 5 * 23, 60 * 5 * 24, 60 * 5 * 25, 60 * 5 * 26, 60 * 5 * 27, 60 * 5 * 28, 60 * 5 * 29, 60 * 5 * 30];
+    const config = getConfig()
+    if(!config) return
+
+    var URL_Player1 = config.URL_Player1 || ""
+    var URL_Player2 = config.URL_Player2 || ""
+    var URLS_player3 = config.URLS_player3 || []
+    var tempoDeInicioP3 = config.tempoDeInicioP3 || []
 
     var rect1;
     var rect2;
@@ -452,4 +455,16 @@ function decode() {
             }, 400);
         }, 500);
     }
+}
+
+function getConfig(){
+    const description = document.querySelector("#description").textContent
+    if(!description) return ""
+    const config = description.split('[[[')[1].split("]]]")[0]
+    try {
+        return JSON.parse(config)
+    } catch (error) {
+        console.log("ERROR: Informações de configuração não encontradas na descrição.")
+        return ""
+    } 
 }
