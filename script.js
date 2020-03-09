@@ -21,72 +21,61 @@ function decode() {
     const config = getConfig()
     if(!config) return
 
-    var URL_Player1 = config.URL_Player1 || ""
-    var URL_Player2 = config.URL_Player2 || ""
-    var URLS_player3 = config.URLS_player3 || []
-    var tempoDeInicioP3 = config.tempoDeInicioP3 || []
+    const URL_Player1 = config.URL_Player1 || ""
+    const URL_Player2 = config.URL_Player2 || ""
+    const URLS_player3 = config.URLS_player3 || []
+    const tempoDeInicioP3 = config.tempoDeInicioP3 || []
 
-    var rect1;
-    var rect2;
-    var rect3;
-    var rect4;
+    var rect1, rect2, rect3, rect4;
 
     var soundIndex;
 
-    var video0;
-    var video1;
-    var video2;
+    const mainVideo = getMainVideo();
+    var videoA, videoB;
     var video3 = [];
-    var player1;
-    var player2;
+    var playerA, playerB;
     var player3 = [];
     var iframe1, iframe2;
-    GetVideo0();
 
-    if (video0.currentTime < 60 * 1 + 30)
-        video0.currentTime = 0;
+    if (mainVideo.currentTime < 60 * 1 + 30)
+        mainVideo.currentTime = 0;
 
-    var container = video0.parentElement.parentElement.parentElement;
+    var container = document.querySelector("#container")
 
-    var cHeigth = video0.clientHeight;
-    var cWidth = video0.clientWidth;
-    var vHeigth = video0.videoHeight;
-    var vWidth = video0.videoWidth;
-    var v1Heigth = video0.videoHeight;
-    var v1Width = video0.videoWidth;
-    var v2Heigth = video0.videoHeight;
-    var v2Width = video0.videoWidth;
+    var cHeigth = mainVideo.clientHeight;
+    var cWidth = mainVideo.clientWidth;
+    var vHeigth = mainVideo.videoHeight;
+    var vWidth = mainVideo.videoWidth;
+    var v1Heigth = mainVideo.videoHeight;
+    var v1Width = mainVideo.videoWidth;
+    var v2Heigth = mainVideo.videoHeight;
+    var v2Width = mainVideo.videoWidth;
 
-    var tag = document.createElement('script');
+    const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
+    const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
     soundIndex = GetSoundIndex();
 
-    var canvas1 = GetCanvas("canvas1", 10, video0.style.left.replace("px", ""));
-    var canvas2 = GetCanvas("canvas2", -10, -5000);
-    var ctx1 = canvas1.getContext('2d');
-    var ctx2 = canvas2.getContext('2d');
+    var canvas = GetCanvas("canvas", 10);
+    var ctx1 = canvas.getContext('2d');
 
-    // video0.style.left = -5000 + "px";
-    // video0.controls = false;
-
-    video0.addEventListener('play', Update, 0);
-    video0.onplay = PLAY;
-    video0.onpause = PAUSE;
-    video0.onvolumechange = OnVolumeChange;
-    video0.onwaiting = Waiting;
-    video0.onseeked = Seeked;
+    mainVideo.addEventListener('play', Update, 0);
+    mainVideo.onplay = play;
+    mainVideo.onpause = pause;
+    mainVideo.onvolumechange = volumeChange;
+    mainVideo.waiting = waiting;
+    mainVideo.onseeked = seeked;
 
     var m = 0.002;
 
     window.onYouTubeIframeAPIReady = function () {
         console.log("Window onYouTubeIframeAPIReady")
-        player1 = GetPlayer(URL_Player1, Player1_READY, 144, 360, ResiC);
-        player2 = GetPlayer(URL_Player2, Player2_READY, 144, 360, ResiC);
-        GetVideo1();
-        GetVideo2();
+        playerA = GetPlayer(URL_Player1, Player1_READY, 144, 360, ResiC);
+        playerB = GetPlayer(URL_Player2, Player2_READY, 144, 360, ResiC);
+        getVideoA();
+        getVideoB();
         GetTwoSounds();
     }
 
@@ -106,38 +95,39 @@ function decode() {
     }
 
 
-    function GetVideo0() {
-        video0 = document.getElementsByTagName("video")[0];
-        video0.muted = true;
+    function getMainVideo() {
+        const video = document.getElementsByTagName("video")[0];
+        video.muted = true;
+        return video
     }
 
-    function GetVideo1() {
+    function getVideoA() {
         iframe1 = document.getElementById(URL_Player1);
         iframe1.onload = function () {
-            video1 = (iframe1.contentDocument || iframe1.contentWindow.document).getElementsByTagName("video")[0];
-            if (video1) console.log("Obtained: video1"); else console.log("Failed: video1");
-            video1.onwaiting = Waiting;
-            v1Heigth = video1.videoHeight;
-            v1Width = video1.videoWidth;
+            videoA = (iframe1.contentDocument || iframe1.contentWindow.document).getElementsByTagName("video")[0];
+            if (videoA) console.log("Obtained: videoA"); else console.log("Failed: videoA");
+            videoA.waiting = waiting;
+            v1Heigth = videoA.videoHeight;
+            v1Width = videoA.videoWidth;
             ResiC();
-            video1.onseeked = function () { if (video1 && video2) DrawCanvas(); };
-            video1.muted = true;
-            player1.playVideo();
+            videoA.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
+            videoA.muted = true;
+            playerA.playVideo();
         }
     }
 
-    function GetVideo2() {
+    function getVideoB() {
         iframe2 = document.getElementById(URL_Player2);
         iframe2.onload = function () {
-            video2 = (iframe2.contentDocument || iframe2.contentWindow.document).getElementsByTagName("video")[0];
-            if (video2) console.log("Obtained: video2"); else console.log("Failed: video2");
-            video2.onwaiting = Waiting;
-            v2Heigth = video2.videoHeight;
-            v2Width = video2.videoWidth;
+            videoB = (iframe2.contentDocument || iframe2.contentWindow.document).getElementsByTagName("video")[0];
+            if (videoB) console.log("Obtained: videoB"); else console.log("Failed: videoB");
+            videoB.waiting = waiting;
+            v2Heigth = videoB.videoHeight;
+            v2Width = videoB.videoWidth;
             ResiC();
-            video2.onseeked = function () { if (video1 && video2) DrawCanvas(); };
-            video2.muted = true;
-            player2.playVideo();
+            videoB.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
+            videoB.muted = true;
+            playerB.playVideo();
         }
     }
 
@@ -147,7 +137,7 @@ function decode() {
             video3[i] = (iframe.contentDocument || iframe.contentWindow.document).getElementsByTagName("video")[0];
             if (video3[i]) console.log("Obtained: video3[" + i + "]"); else console.log("Failed: video3[" + i + "]");
             video3[i].index = i;
-            video3[i].onwaiting = WaitingPlayer3;
+            video3[i].waiting = onwaitingPlayer3;
             if (lowPlayBackRate)
                 video3[i].playbackRate = 0.07;
         }
@@ -155,24 +145,23 @@ function decode() {
 
     function Player1_READY() {
         console.log("Player 1 Ready");
-        player1.playVideo();
+        playerA.playVideo();
     }
 
     function Player2_READY() {
         console.log("Player 2 Ready");
-        player2.playVideo();
+        playerB.playVideo();
     }
 
-    function GetCanvas(id, zPosition, xPosition) {
-        var canvas;
-        canvas = document.createElement('canvas');
+    function GetCanvas(id, zIndex=0) {
+        const canvas = document.createElement('canvas');
         canvas.id = id;
         canvas.width = cWidth;
         canvas.height = cHeigth;
-        video0.parentElement.appendChild(canvas);
-        canvas.style.zIndex = zPosition;
+        mainVideo.parentElement.appendChild(canvas);
+        canvas.style.zIndex = zIndex;
         canvas.style.position = "relative";
-        canvas.style.left = xPosition + "px";
+        canvas.style.left = mainVideo.style.left;
         return canvas;
     }
 
@@ -189,25 +178,24 @@ function decode() {
 
 
     function DrawCanvas() {
-        ctx2.drawImage(video2, rect1[0], rect1[1], rect1[2], rect1[3], rect1[4], rect1[5], rect1[6], rect1[7]);
-        ctx2.drawImage(video1, rect2[0], rect2[1], rect2[2], rect2[3], rect2[4], rect2[5], rect2[6], rect2[7]);
-        ctx2.drawImage(video2, rect3[0], rect3[1], rect3[2], rect3[3], rect3[4], rect3[5], rect3[6], rect3[7]);
-        ctx2.drawImage(video1, rect4[0], rect4[1], rect4[2], rect4[3], rect4[4], rect4[5], rect4[6], rect4[7]);
-        ctx1.drawImage(canvas2, 0, 0, canvas2.clientWidth, canvas2.clientHeight, 0, 0, canvas1.clientWidth, canvas1.clientHeight);
+        ctx1.drawImage(videoB, rect1[0], rect1[1], rect1[2], rect1[3], rect1[4], rect1[5], rect1[6], rect1[7]);
+        ctx1.drawImage(videoA, rect2[0], rect2[1], rect2[2], rect2[3], rect2[4], rect2[5], rect2[6], rect2[7]);
+        ctx1.drawImage(videoB, rect3[0], rect3[1], rect3[2], rect3[3], rect3[4], rect3[5], rect3[6], rect3[7]);
+        ctx1.drawImage(videoA, rect4[0], rect4[1], rect4[2], rect4[3], rect4[4], rect4[5], rect4[6], rect4[7]);
     }
 
     function ResiC() {
-        canvas1.style.top = video0.style.top;
-        canvas1.style.left = container.clientWidth / 2 - canvas1.clientWidth / 2 + "px";
-        canvas2.width = canvas1.width = cWidth = video0.clientWidth;
-        canvas2.height = canvas1.height = cHeigth = video0.clientHeight;
-        vHeigth = video0.videoHeight;
-        vWidth = video0.videoWidth;
-        if (video1) {
-            v1Heigth = video1.videoHeight; v1Width = video1.videoWidth;
+        canvas.style.top = mainVideo.style.top;
+        canvas.style.left = container.clientWidth / 2 - canvas.clientWidth / 2 + "px";
+        canvas.width = cWidth = mainVideo.clientWidth;
+        canvas.height = cHeigth = mainVideo.clientHeight;
+        vHeigth = mainVideo.videoHeight;
+        vWidth = mainVideo.videoWidth;
+        if (videoA) {
+            v1Heigth = videoA.videoHeight; v1Width = videoA.videoWidth;
         }
-        if (video2) {
-            v2Heigth = video2.videoHeight; v2Width = video2.videoWidth;
+        if (videoB) {
+            v2Heigth = videoB.videoHeight; v2Width = videoB.videoWidth;
         }
         rect1 = [0, 0, Math.ceil(v2Width / 2), Math.ceil(v2Heigth / 2), Math.floor(cWidth / 2), Math.floor(cHeigth / 2), Math.ceil(cWidth / 2), Math.ceil(cHeigth / 2)];
         rect2 = [Math.ceil(v1Width / 2), 0, Math.floor(v1Width / 2), Math.ceil(v1Heigth / 2), 0, Math.floor(cHeigth / 2), Math.floor(cWidth / 2), Math.ceil(cHeigth / 2)];
@@ -216,127 +204,127 @@ function decode() {
     }
 
     function Update() {
-        if (!(video0.paused || video0.ended)) {
+        if (!(mainVideo.paused || mainVideo.ended)) {
             DrawCanvas();
-            if (Math.abs(video0.currentTime - player1.getCurrentTime()) > m) {
-                if (video0.currentTime - player1.getCurrentTime() > 0) {
-                    video1.playbackRate = video0.playbackRate + Math.min(15, video0.currentTime - player1.getCurrentTime());
+            if (Math.abs(mainVideo.currentTime - playerA.getCurrentTime()) > m) {
+                if (mainVideo.currentTime - playerA.getCurrentTime() > 0) {
+                    videoA.playbackRate = mainVideo.playbackRate + Math.min(15, mainVideo.currentTime - playerA.getCurrentTime());
                 } else {
-                    video1.playbackRate = video0.playbackRate + Math.max(-0.93, video0.currentTime - player1.getCurrentTime());
+                    videoA.playbackRate = mainVideo.playbackRate + Math.max(-0.93, mainVideo.currentTime - playerA.getCurrentTime());
                 }
             } else {
-                video1.playbackRate = video0.playbackRate;
+                videoA.playbackRate = mainVideo.playbackRate;
             }
-            if (Math.abs(video0.currentTime - player2.getCurrentTime()) > m) {
+            if (Math.abs(mainVideo.currentTime - playerB.getCurrentTime()) > m) {
 
-                if (video0.currentTime - player2.getCurrentTime() > 0) {
-                    video2.playbackRate = video0.playbackRate + Math.min(15, video0.currentTime - player2.getCurrentTime());
+                if (mainVideo.currentTime - playerB.getCurrentTime() > 0) {
+                    videoB.playbackRate = mainVideo.playbackRate + Math.min(15, mainVideo.currentTime - playerB.getCurrentTime());
                 } else {
-                    video2.playbackRate = video0.playbackRate + Math.max(-0.93, video0.currentTime - player2.getCurrentTime());
+                    videoB.playbackRate = mainVideo.playbackRate + Math.max(-0.93, mainVideo.currentTime - playerB.getCurrentTime());
                 }
             } else {
-                video2.playbackRate = video0.playbackRate;
+                videoB.playbackRate = mainVideo.playbackRate;
             }
             try {
-                if (Math.abs((video0.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime()) > m) {
-                    if ((video0.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime() > 0) {
+                if (Math.abs((mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime()) > m) {
+                    if ((mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime() > 0) {
                         try {
-                            video3[soundIndex].playbackRate = video0.playbackRate + Math.min(15, (video0.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
+                            video3[soundIndex].playbackRate = mainVideo.playbackRate + Math.min(15, (mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
                         } catch (erro) { }
                     } else {
                         try {
-                            video3[soundIndex].playbackRate = video0.playbackRate + Math.max(-0.93, (video0.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
+                            video3[soundIndex].playbackRate = mainVideo.playbackRate + Math.max(-0.93, (mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
                         } catch (erro) { }
                     }
                 } else {
                     try {
-                        video3[soundIndex].playbackRate = video0.playbackRate;
+                        video3[soundIndex].playbackRate = mainVideo.playbackRate;
                     } catch (erro) { }
                 }
             } catch (error) { }
             try {
-                if (video0.currentTime >= tempoDeInicioP3[soundIndex + 1]) {
-                    if (video0.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
+                if (mainVideo.currentTime >= tempoDeInicioP3[soundIndex + 1]) {
+                    if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
                         DeleteCurrentSound();
                         soundIndex = GetSoundIndex();
                         ChangeToNextSound();
                     }
                 }
             } catch (error) { }
-            if (video0.clientWidth != cWidth) {
-                video0.style.left = -5000 + "px";
+            if (mainVideo.clientWidth != cWidth) {
+                mainVideo.style.left = -5000 + "px";
                 ResiC();
             }
-            if (video0.videoHeight != vHeigth || video2.videoHeight != v2Heigth || video1.videoHeight != v1Heigth) {
+            if (mainVideo.videoHeight != vHeigth || videoB.videoHeight != v2Heigth || videoA.videoHeight != v1Heigth) {
                 ResiC();
             }
             setTimeout(Update, 1000 / 30.0);
         }
     }
 
-    function PLAY() {
-        if (player1.getPlayerState() != YT.PlayerState.BUFFERING && player2.getPlayerState() != YT.PlayerState.BUFFERING && player3[soundIndex].getPlayerState() != YT.PlayerState.BUFFERING) {
-            player1.playVideo();
-            player2.playVideo();
+    function play() {
+        if (playerA.getPlayerState() != YT.PlayerState.BUFFERING && playerB.getPlayerState() != YT.PlayerState.BUFFERING && player3[soundIndex].getPlayerState() != YT.PlayerState.BUFFERING) {
+            playerA.playVideo();
+            playerB.playVideo();
             if (player3[soundIndex]) {
                 player3[soundIndex].playVideo();
-                player3[soundIndex].setVolume(video0.volume * 100);
+                player3[soundIndex].setVolume(mainVideo.volume * 100);
             }
         } else {
-            video0.pause();
-            player1.pauseVideo();
-            player2.pauseVideo();
+            mainVideo.pause();
+            playerA.pauseVideo();
+            playerB.pauseVideo();
             if (player3[soundIndex])
                 player3[soundIndex].pauseVideo();
         }
 
     }
 
-    function PAUSE() {
-        video0.pause();
-        video0.muted = true;
-        if (player1) {
-            player1.pauseVideo();
-            player1.seekTo(video0.currentTime, true);
+    function pause() {
+        mainVideo.pause();
+        mainVideo.muted = true;
+        if (playerA) {
+            playerA.pauseVideo();
+            playerA.seekTo(mainVideo.currentTime, true);
         }
-        if (player2) {
-            player2.pauseVideo();
-            player2.seekTo(video0.currentTime, true);
+        if (playerB) {
+            playerB.pauseVideo();
+            playerB.seekTo(mainVideo.currentTime, true);
         }
         if (player3[soundIndex]) {
             player3[soundIndex].pauseVideo();
-            player3[soundIndex].seekTo(video0.currentTime - tempoDeInicioP3[soundIndex], true);
-            player3[soundIndex].setVolume(video0.volume * 100);
+            player3[soundIndex].seekTo(mainVideo.currentTime - tempoDeInicioP3[soundIndex], true);
+            player3[soundIndex].setVolume(mainVideo.volume * 100);
         }
-        if (video1)
-            video1.muted = true;
-        if (video2)
-            video2.muted = true;
+        if (videoA)
+            videoA.muted = true;
+        if (videoB)
+            videoB.muted = true;
         setTimeout(ResiC, 1000);
-        setTimeout(function () { if (video1 && video2) DrawCanvas(); }, 1000);
+        setTimeout(function () { if (videoA && videoB) DrawCanvas(); }, 1000);
     }
 
-    function OnVolumeChange() {
+    function volumeChange() {
         if (player3[soundIndex]) {
-            video0.muted = true;
-            video1.muted = true;
-            video2.muted = true;
-            player3[soundIndex].setVolume(video0.volume * 100);
+            mainVideo.muted = true;
+            videoA.muted = true;
+            videoB.muted = true;
+            player3[soundIndex].setVolume(mainVideo.volume * 100);
         }
     }
 
-    function Waiting() {
-        PAUSE();
+    function waiting() {
+        pause();
     }
-    function WaitingPlayer3() {
-        if (this.index == soundIndex && !this.dontPauseOnWaiting) {
-            PAUSE();
+    function onwaitingPlayer3() {
+        if (this.index == soundIndex && !this.dontPauseOnonwaiting) {
+            pause();
         }
     }
 
-    function Seeked() {
-        console.log("Seeked: " + GetSoundIndex() + " " + soundIndex);
-        PAUSE();
+    function seeked() {
+        console.log("seeked: " + GetSoundIndex() + " " + soundIndex);
+        pause();
 
         var newIndex = GetSoundIndex();
         if (newIndex != soundIndex) {
@@ -349,15 +337,15 @@ function decode() {
         }
 
         ResiC();
-        if (video1 && video2)
+        if (videoA && videoB)
             DrawCanvas();
 
-        console.log("Seeked END");
+        console.log("seeked END");
     }
 
     function GetSoundIndex() {
-        for (var i = 0; i < tempoDeInicioP3.length - 1; i++) {
-            if (video0.currentTime >= tempoDeInicioP3[i] && video0.currentTime < tempoDeInicioP3[i + 1]) {
+        for (let i = 0; i < tempoDeInicioP3.length - 1; i++) {
+            if (mainVideo.currentTime >= tempoDeInicioP3[i] && mainVideo.currentTime < tempoDeInicioP3[i + 1]) {
                 return i;
             }
         }
@@ -381,13 +369,13 @@ function decode() {
     }
 
     function ChangeToNextSound() {
-        video3[soundIndex].playbackRate = video0.playbackRate;
-        player3[soundIndex].setVolume(video0.volume * 100);
-        video3[soundIndex].dontPauseOnWaiting = true;
-        player3[soundIndex].seekTo(video0.currentTime - tempoDeInicioP3[soundIndex], true);
+        video3[soundIndex].playbackRate = mainVideo.playbackRate;
+        player3[soundIndex].setVolume(mainVideo.volume * 100);
+        video3[soundIndex].dontPauseOnonwaiting = true;
+        player3[soundIndex].seekTo(mainVideo.currentTime - tempoDeInicioP3[soundIndex], true);
         player3[soundIndex + 1] = GetPlayer(URLS_player3[soundIndex + 1], function () { player3[soundIndex + 1].playVideo(); player3[soundIndex + 1].setVolume(0); }, 144, 360);
         GetVideo3(soundIndex + 1, true);
-        PLAY();
+        play();
     }
 
     function DeleteUselessSounds(deleteAllSounds) {
