@@ -35,7 +35,6 @@ function decode() {
     var video3 = [];
     var playerA, playerB;
     var player3 = [];
-    var iframe1, iframe2;
 
     if (mainVideo.currentTime < 60 * 1 + 30)
         mainVideo.currentTime = 0;
@@ -46,10 +45,10 @@ function decode() {
     var cWidth = mainVideo.clientWidth;
     var vHeigth = mainVideo.videoHeight;
     var vWidth = mainVideo.videoWidth;
-    var v1Heigth = mainVideo.videoHeight;
-    var v1Width = mainVideo.videoWidth;
-    var v2Heigth = mainVideo.videoHeight;
-    var v2Width = mainVideo.videoWidth;
+    var vAHeigth = mainVideo.videoHeight;
+    var vAWidth = mainVideo.videoWidth;
+    var vBHeigth = mainVideo.videoHeight;
+    var vBWidth = mainVideo.videoWidth;
 
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
@@ -58,8 +57,8 @@ function decode() {
 
     soundIndex = GetSoundIndex();
 
-    var canvas = GetCanvas("canvas", 10);
-    var ctx1 = canvas.getContext('2d');
+    const canvas = GetCanvas("canvas", 10);
+    const ctx1 = canvas.getContext('2d');
 
     mainVideo.addEventListener('play', Update, 0);
     mainVideo.onplay = play;
@@ -68,14 +67,52 @@ function decode() {
     mainVideo.waiting = waiting;
     mainVideo.onseeked = seeked;
 
-    var m = 0.002;
+    const m = 0.002;
+
+    
+    document.addEventListener("fullscreenchange", function () {
+        setTimeout(ResizeCanvas, 1000);
+    }, false);
+
+    document.addEventListener("msfullscreenchange", function () {
+        setTimeout(ResizeCanvas, 1000);
+    }, false);
+
+    document.addEventListener("mozfullscreenchange", function () {
+        setTimeout(ResizeCanvas, 1000);
+    }, false);
+
+    document.addEventListener("webkitfullscreenchange", function () {
+        setTimeout(ResizeCanvas, 1000);
+    }, false);
+
 
     window.onYouTubeIframeAPIReady = function () {
         console.log("Window onYouTubeIframeAPIReady")
-        playerA = GetPlayer(URL_Player1, Player1_READY, 144, 360, ResiC);
-        playerB = GetPlayer(URL_Player2, Player2_READY, 144, 360, ResiC);
-        getVideoA();
-        getVideoB();
+
+        playerA = GetPlayer(URL_Player1, PlayerAReady, 144, 360, ResizeCanvas);
+        playerB = GetPlayer(URL_Player2, PlayerBReady, 144, 360, ResizeCanvas);
+
+        getVideo(URL_Player1).then(video => {
+            videoA = video
+            videoA.waiting = waiting;
+            vAHeigth = videoA.videoHeight;
+            vAWidth = videoA.videoWidth;
+            videoA.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
+            videoA.muted = true;
+            playerA.playVideo();
+        }).catch(console.error)
+
+        getVideo(URL_Player2).then(video => {
+            videoB = video
+            videoB.waiting = waiting;
+            vBHeigth = videoB.videoHeight;
+            vBWidth = videoB.videoWidth;
+            videoB.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
+            videoB.muted = true;
+            playerB.playVideo();
+        }).catch(console.error)
+
         GetTwoSounds();
     }
 
@@ -98,37 +135,23 @@ function decode() {
     function getMainVideo() {
         const video = document.getElementsByTagName("video")[0];
         video.muted = true;
+        video.style.marginLeft = "5000px"
         return video
     }
 
-    function getVideoA() {
-        iframe1 = document.getElementById(URL_Player1);
-        iframe1.onload = function () {
-            videoA = (iframe1.contentDocument || iframe1.contentWindow.document).getElementsByTagName("video")[0];
-            if (videoA) console.log("Obtained: videoA"); else console.log("Failed: videoA");
-            videoA.waiting = waiting;
-            v1Heigth = videoA.videoHeight;
-            v1Width = videoA.videoWidth;
-            ResiC();
-            videoA.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
-            videoA.muted = true;
-            playerA.playVideo();
-        }
-    }
 
-    function getVideoB() {
-        iframe2 = document.getElementById(URL_Player2);
-        iframe2.onload = function () {
-            videoB = (iframe2.contentDocument || iframe2.contentWindow.document).getElementsByTagName("video")[0];
-            if (videoB) console.log("Obtained: videoB"); else console.log("Failed: videoB");
-            videoB.waiting = waiting;
-            v2Heigth = videoB.videoHeight;
-            v2Width = videoB.videoWidth;
-            ResiC();
-            videoB.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
-            videoB.muted = true;
-            playerB.playVideo();
-        }
+    function getVideo(url) {
+        return new Promise((resolve, reject) => {
+            const iframe = document.getElementById(url);
+            iframe.onload = function () {
+                video = (iframe.contentDocument || iframe.contentWindow.document).getElementsByTagName("video")[0];
+                if (video){
+                    resolve(video)
+                } else {
+                    throw new Error("VideoA não encontrado.");
+                }
+            }
+        })
     }
 
     function GetVideo3(i, lowPlayBackRate) {
@@ -143,12 +166,12 @@ function decode() {
         }
     }
 
-    function Player1_READY() {
+    function PlayerAReady() {
         console.log("Player 1 Ready");
         playerA.playVideo();
     }
 
-    function Player2_READY() {
+    function PlayerBReady() {
         console.log("Player 2 Ready");
         playerB.playVideo();
     }
@@ -184,7 +207,7 @@ function decode() {
         ctx1.drawImage(videoA, rect4[0], rect4[1], rect4[2], rect4[3], rect4[4], rect4[5], rect4[6], rect4[7]);
     }
 
-    function ResiC() {
+    function ResizeCanvas() {
         canvas.style.top = mainVideo.style.top;
         canvas.style.left = container.clientWidth / 2 - canvas.clientWidth / 2 + "px";
         canvas.width = cWidth = mainVideo.clientWidth;
@@ -192,15 +215,15 @@ function decode() {
         vHeigth = mainVideo.videoHeight;
         vWidth = mainVideo.videoWidth;
         if (videoA) {
-            v1Heigth = videoA.videoHeight; v1Width = videoA.videoWidth;
+            vAHeigth = videoA.videoHeight; vAWidth = videoA.videoWidth;
         }
         if (videoB) {
-            v2Heigth = videoB.videoHeight; v2Width = videoB.videoWidth;
+            vBHeigth = videoB.videoHeight; vBWidth = videoB.videoWidth;
         }
-        rect1 = [0, 0, Math.ceil(v2Width / 2), Math.ceil(v2Heigth / 2), Math.floor(cWidth / 2), Math.floor(cHeigth / 2), Math.ceil(cWidth / 2), Math.ceil(cHeigth / 2)];
-        rect2 = [Math.ceil(v1Width / 2), 0, Math.floor(v1Width / 2), Math.ceil(v1Heigth / 2), 0, Math.floor(cHeigth / 2), Math.floor(cWidth / 2), Math.ceil(cHeigth / 2)];
-        rect3 = [0, Math.ceil(v2Heigth / 2), Math.ceil(v2Width / 2), Math.floor(v2Heigth / 2), Math.floor(cWidth / 2), 0, Math.ceil(cWidth / 2), Math.floor(cHeigth / 2)];
-        rect4 = [Math.ceil(v1Width / 2), Math.ceil(v1Heigth / 2), Math.floor(v1Width / 2), Math.floor(v1Heigth / 2), 0, 0, Math.floor(cWidth / 2), Math.floor(cHeigth / 2)];
+        rect1 = [0, 0, Math.ceil(vBWidth / 2), Math.ceil(vBHeigth / 2), Math.floor(cWidth / 2), Math.floor(cHeigth / 2), Math.ceil(cWidth / 2), Math.ceil(cHeigth / 2)];
+        rect2 = [Math.ceil(vAWidth / 2), 0, Math.floor(vAWidth / 2), Math.ceil(vAHeigth / 2), 0, Math.floor(cHeigth / 2), Math.floor(cWidth / 2), Math.ceil(cHeigth / 2)];
+        rect3 = [0, Math.ceil(vBHeigth / 2), Math.ceil(vBWidth / 2), Math.floor(vBHeigth / 2), Math.floor(cWidth / 2), 0, Math.ceil(cWidth / 2), Math.floor(cHeigth / 2)];
+        rect4 = [Math.ceil(vAWidth / 2), Math.ceil(vAHeigth / 2), Math.floor(vAWidth / 2), Math.floor(vAHeigth / 2), 0, 0, Math.floor(cWidth / 2), Math.floor(cHeigth / 2)];
     }
 
     function Update() {
@@ -253,10 +276,10 @@ function decode() {
             } catch (error) { }
             if (mainVideo.clientWidth != cWidth) {
                 mainVideo.style.left = -5000 + "px";
-                ResiC();
+                ResizeCanvas();
             }
-            if (mainVideo.videoHeight != vHeigth || videoB.videoHeight != v2Heigth || videoA.videoHeight != v1Heigth) {
-                ResiC();
+            if (mainVideo.videoHeight != vHeigth || videoB.videoHeight != vBHeigth || videoA.videoHeight != vAHeigth) {
+                ResizeCanvas();
             }
             setTimeout(Update, 1000 / 30.0);
         }
@@ -300,7 +323,7 @@ function decode() {
             videoA.muted = true;
         if (videoB)
             videoB.muted = true;
-        setTimeout(ResiC, 1000);
+        setTimeout(ResizeCanvas, 1000);
         setTimeout(function () { if (videoA && videoB) DrawCanvas(); }, 1000);
     }
 
@@ -336,7 +359,7 @@ function decode() {
             GetTwoSounds();
         }
 
-        ResiC();
+        ResizeCanvas();
         if (videoA && videoB)
             DrawCanvas();
 
@@ -394,22 +417,6 @@ function decode() {
         } catch (error) { }
 
     }
-
-    document.addEventListener("fullscreenchange", function () {
-        setTimeout(ResiC, 1000);
-    }, false);
-
-    document.addEventListener("msfullscreenchange", function () {
-        setTimeout(ResiC, 1000);
-    }, false);
-
-    document.addEventListener("mozfullscreenchange", function () {
-        setTimeout(ResiC, 1000);
-    }, false);
-
-    document.addEventListener("webkitfullscreenchange", function () {
-        setTimeout(ResiC, 1000);
-    }, false);
 
     document.getElementsByClassName("ytp-button ytp-settings-button")[0].onclick = function () {
         setTimeout(function () {
