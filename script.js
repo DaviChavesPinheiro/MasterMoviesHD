@@ -1,48 +1,73 @@
 window.onload = () => {
-    const button = document.createElement("button")
-    button.id = "decodeBtn"
-    button.classList.add("masterButton")
-    button.textContent = "DECODIFICAR"
-    button.addEventListener("click", buttonClicked)
-    document.querySelector(".ytp-chrome-controls .ytp-right-controls").prepend(button)
+    createDecodeElement()
 
-    const status = document.createElement("button")
-    status.id = "status"
-    status.classList.add("masterButton")
-    status.classList.add("hidden")
-    status.textContent = "STATUS"
-    status.addEventListener("click", toggleStatus)
-    document.querySelector(".ytp-chrome-controls .ytp-left-controls").append(status)
+    createStatusElement()
 
-    const statusPanel = document.createElement("div")
-    statusPanel.id = "statusPanel"
-    statusPanel.classList.add("mm","panel")
-    statusPanel.classList.add("hidden")
-    // statusPanel.addEventListener("click", toggleStatus)
-    document.querySelector("#movie_player").append(statusPanel)
+    createPanelElement()
+
 }
 
-function buttonClicked() {
-    const button = document.querySelector("#decodeBtn")
-    button.classList.toggle("decoded")
+function createDecodeElement(){
+    const d = document.createElement("button")
+    d.id = "decode"
+    d.classList.add("mm")
+    d.classList.add("button")
+    d.textContent = "DECODIFICAR"
+    d.addEventListener("click", decode)
+    document.querySelector(".ytp-chrome-controls .ytp-right-controls").prepend(d)
+}
 
-    const status = document.querySelector("#status")
-    status.classList.toggle("hidden")
+function createStatusElement(){
+    const s = document.createElement("button")
+    s.id = "status"
+    s.classList.add("mm")
+    s.classList.add("button")
+    s.classList.add("hidden")
+    s.textContent = "STATUS"
+    s.addEventListener("click", status)
+    document.querySelector(".ytp-chrome-controls .ytp-left-controls").append(s)
+}
 
-    const canvas = document.querySelector("#canvas")
-    if (!canvas) {
-        decode()
-    } else {
-        canvas.classList.toggle("hidden")
+function createPanelElement(){
+    const p = document.createElement("div")
+    p.id = "panel"
+    p.classList.add("mm")
+    p.classList.add("panel")
+    p.classList.add("hidden")
+    document.querySelector("#movie_player").append(p)
+}
+
+
+
+function decode() {
+    console.log("click")
+    const d = document.querySelector("#decode")
+    const s = document.querySelector("#status")
+    const c = document.querySelector("#canvas")
+    const p = document.querySelector("#panel")
+
+    if(!d.classList.contains("decoded")){ //VAI CODIFICAR
+        if (!c) {
+            decodeVideo()
+        }
+
+        d.classList.add("decoded")
+        s.classList.remove("hidden")
+        c.classList.remove("hidden")
+    } else {                                  //DESLIGA A CODIFICACAO
+        d.classList.remove("decoded")
+        s.classList.add("hidden")
+        c.classList.add("hidden")
+        p.classList.add("hidden")
     }
 }
 
-function toggleStatus() {
-    const statusPanel = document.querySelector("#statusPanel")
-    statusPanel.classList.toggle("hidden")
+function status() {
+    const p = document.querySelector("#panel")
+    p.classList.toggle("hidden")
 }
 
-function decode() {
+function decodeVideo() {
     const config = getConfig()
     if(!config) return
 
