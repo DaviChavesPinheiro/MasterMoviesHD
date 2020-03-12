@@ -1,20 +1,45 @@
 window.onload = () => {
     const button = document.createElement("button")
     button.id = "decodeBtn"
+    button.classList.add("masterButton")
     button.textContent = "DECODIFICAR"
     button.addEventListener("click", buttonClicked)
     document.querySelector(".ytp-chrome-controls .ytp-right-controls").prepend(button)
+
+    const status = document.createElement("button")
+    status.id = "status"
+    status.classList.add("masterButton")
+    status.classList.add("hidden")
+    status.textContent = "STATUS"
+    status.addEventListener("click", toggleStatus)
+    document.querySelector(".ytp-chrome-controls .ytp-left-controls").append(status)
+
+    const statusPanel = document.createElement("div")
+    statusPanel.id = "statusPanel"
+    statusPanel.classList.add("mm","panel")
+    statusPanel.classList.add("hidden")
+    // statusPanel.addEventListener("click", toggleStatus)
+    document.querySelector("#movie_player").append(statusPanel)
 }
 
 function buttonClicked() {
     const button = document.querySelector("#decodeBtn")
     button.classList.toggle("decoded")
+
+    const status = document.querySelector("#status")
+    status.classList.toggle("hidden")
+
     const canvas = document.querySelector("#canvas")
     if (!canvas) {
         decode()
     } else {
         canvas.classList.toggle("hidden")
     }
+}
+
+function toggleStatus() {
+    const statusPanel = document.querySelector("#statusPanel")
+    statusPanel.classList.toggle("hidden")
 }
 
 function decode() {
@@ -60,7 +85,7 @@ function decode() {
     const canvas = GetCanvas("canvas", 10);
     const ctx1 = canvas.getContext('2d');
 
-    mainVideo.addEventListener('play', Update, 0);
+    mainVideo.addEventListener('play', update, 0);
     mainVideo.onplay = play;
     mainVideo.onpause = pause;
     mainVideo.onvolumechange = volumeChange;
@@ -69,7 +94,6 @@ function decode() {
 
     const m = 0.002;
 
-    
     document.addEventListener("fullscreenchange", function () {
         setTimeout(ResizeCanvas, 1000);
     }, false);
@@ -226,7 +250,7 @@ function decode() {
         rect4 = [Math.ceil(vAWidth / 2), Math.ceil(vAHeigth / 2), Math.floor(vAWidth / 2), Math.floor(vAHeigth / 2), 0, 0, Math.floor(cWidth / 2), Math.floor(cHeigth / 2)];
     }
 
-    function Update() {
+    function update() {
         if (!(mainVideo.paused || mainVideo.ended)) {
             DrawCanvas();
             if (Math.abs(mainVideo.currentTime - playerA.getCurrentTime()) > m) {
@@ -281,7 +305,7 @@ function decode() {
             if (mainVideo.videoHeight != vHeigth || videoB.videoHeight != vBHeigth || videoA.videoHeight != vAHeigth) {
                 ResizeCanvas();
             }
-            setTimeout(Update, 1000 / 30.0);
+            setTimeout(update, 1000 / 30.0);
         }
     }
 
