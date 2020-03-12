@@ -40,7 +40,6 @@ function createPanelElement(){
 
 
 function decode() {
-    console.log("click")
     const d = document.querySelector("#decode")
     const s = document.querySelector("#status")
     const c = document.querySelector("#canvas")
@@ -53,7 +52,8 @@ function decode() {
 
         d.classList.add("decoded")
         s.classList.remove("hidden")
-        c.classList.remove("hidden")
+        if(c)
+            c.classList.remove("hidden")
     } else {                                  //DESLIGA A CODIFICACAO
         d.classList.remove("decoded")
         s.classList.add("hidden")
@@ -65,7 +65,7 @@ function decode() {
 function status() {
     const p = document.querySelector("#panel")
     p.classList.toggle("hidden")
-}
+}   
 
 function decodeVideo() {
     const config = getConfig()
@@ -499,6 +499,24 @@ function decodeVideo() {
             }, 400);
         }, 500);
     }
+
+    setInterval(function(){setPanelContent({URL_Player1,URL_Player2,URLS_player3,tempoDeInicioP3,mainVideo,videoA,videoB}), 2000})
+}
+
+function setPanelContent(data) {
+    const p = document.querySelector("#panel")
+    p.innerHTML = ""
+    Object.entries(data).forEach(entrie => {
+        p.innerHTML += `<p>${entrie[0]}: ${existsOrError(entrie[1])}</p>`
+
+    })
+}
+
+function existsOrError(value, msg){
+    if(!value) return "Error"
+    if(Array.isArray(value) && value.length === 0) return "Error"
+    if(typeof value === 'string' && !value.trim()) return "Error"
+    return "OK!"
 }
 
 function getConfig(){
