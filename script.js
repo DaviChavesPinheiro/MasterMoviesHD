@@ -500,14 +500,14 @@ function decodeVideo() {
         }, 500);
     }
 
-    setInterval(function(){setPanelContent({URL_Player1,URL_Player2,URLS_player3,tempoDeInicioP3,mainVideo,videoA,videoB}), 2000})
+    setInterval(function(){setPanelContent({URL_Player1,URL_Player2,URLS_player3,tempoDeInicioP3,mainVideo,videoA,videoB}), 1000})
 }
 
 function setPanelContent(data) {
     const p = document.querySelector("#panel")
     p.innerHTML = ""
     Object.entries(data).forEach(entrie => {
-        p.innerHTML += `<p>${entrie[0]}: ${existsOrError(entrie[1])}</p>`
+        p.innerHTML += `<p>${entrie[0]}: <span style="color: ${existsOrError(entrie[1]) == 'OK!' ? "lawngreen" : "red"};">${existsOrError(entrie[1])}</span></p>`
 
     })
 }
