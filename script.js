@@ -150,6 +150,7 @@ function decodeVideo() {
             videoA.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
             videoA.muted = true;
             playerA.playVideo();
+            videoA.style.visibility = "hidden"
         }).catch(console.error)
 
         getVideo(URL_Player2).then(video => {
@@ -160,6 +161,7 @@ function decodeVideo() {
             videoB.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
             videoB.muted = true;
             playerB.playVideo();
+            videoB.style.visibility = "hidden"
         }).catch(console.error)
 
         GetTwoSounds();
@@ -184,7 +186,7 @@ function decodeVideo() {
     function getMainVideo() {
         const video = document.getElementsByTagName("video")[0];
         video.muted = true;
-        video.style.marginLeft = "5000px"
+        video.style.visibility = "hidden"
         return video
     }
 
@@ -233,7 +235,6 @@ function decodeVideo() {
         mainVideo.parentElement.appendChild(canvas);
         canvas.style.zIndex = zIndex;
         canvas.style.position = "relative";
-        canvas.style.left = mainVideo.style.left;
         return canvas;
     }
 
@@ -257,8 +258,6 @@ function decodeVideo() {
     }
 
     function ResizeCanvas() {
-        canvas.style.top = mainVideo.style.top;
-        canvas.style.left = container.clientWidth / 2 - canvas.clientWidth / 2 + "px";
         canvas.width = cWidth = mainVideo.clientWidth;
         canvas.height = cHeigth = mainVideo.clientHeight;
         vHeigth = mainVideo.videoHeight;
