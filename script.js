@@ -123,6 +123,10 @@ function decodeVideo() {
         ResizeCanvas()
     })
 
+    document.querySelector("video").addEventListener('resize', function(event){
+        ResizeCanvas()
+    })
+
 
     window.onYouTubeIframeAPIReady = function () {
         console.log("Window onYouTubeIframeAPIReady")
@@ -139,6 +143,9 @@ function decodeVideo() {
             videoA.muted = true;
             playerA.playVideo();
             videoA.style.visibility = "hidden"
+            videoA.addEventListener('resize', function(event){
+                ResizeCanvas()
+            })
         }).catch(console.error)
 
         getVideo(URL_Player2).then(video => {
@@ -150,6 +157,9 @@ function decodeVideo() {
             videoB.muted = true;
             playerB.playVideo();
             videoB.style.visibility = "hidden"
+            videoB.addEventListener('resize', function(event){
+                ResizeCanvas()
+            })
         }).catch(console.error)
 
         GetTwoSounds();
@@ -313,9 +323,9 @@ function decodeVideo() {
             //     mainVideo.style.left = -5000 + "px";
             //     ResizeCanvas();
             // }
-            if (mainVideo.videoHeight != vHeigth || videoB.videoHeight != vBHeigth || videoA.videoHeight != vAHeigth) {
-                ResizeCanvas();
-            }
+            // if (mainVideo.videoHeight != vHeigth || videoB.videoHeight != vBHeigth || videoA.videoHeight != vAHeigth) {
+            //     ResizeCanvas();
+            // }
             setTimeout(update, 1000 / 30.0);
         }
     }
