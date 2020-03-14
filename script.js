@@ -119,21 +119,9 @@ function decodeVideo() {
 
     const m = 0.002;
 
-    document.addEventListener("fullscreenchange", function () {
-        setTimeout(ResizeCanvas, 1000);
-    }, false);
-
-    document.addEventListener("msfullscreenchange", function () {
-        setTimeout(ResizeCanvas, 1000);
-    }, false);
-
-    document.addEventListener("mozfullscreenchange", function () {
-        setTimeout(ResizeCanvas, 1000);
-    }, false);
-
-    document.addEventListener("webkitfullscreenchange", function () {
-        setTimeout(ResizeCanvas, 1000);
-    }, false);
+    document.querySelector("#movie_player").addEventListener('resize', function(event){
+        ResizeCanvas()
+    })
 
 
     window.onYouTubeIframeAPIReady = function () {
@@ -274,60 +262,60 @@ function decodeVideo() {
     }
 
     function update() {
-        if (!(mainVideo.paused || mainVideo.ended)) {
+        if (!(mainVideo.paused | mainVideo.ended)) {
             DrawCanvas();
-            // if (Math.abs(mainVideo.currentTime - playerA.getCurrentTime()) > m) {
-            //     if (mainVideo.currentTime - playerA.getCurrentTime() > 0) {
-            //         videoA.playbackRate = mainVideo.playbackRate + Math.min(15, mainVideo.currentTime - playerA.getCurrentTime());
-            //     } else {
-            //         videoA.playbackRate = mainVideo.playbackRate + Math.max(-0.93, mainVideo.currentTime - playerA.getCurrentTime());
-            //     }
-            // } else {
-            //     videoA.playbackRate = mainVideo.playbackRate;
-            // }
-            // if (Math.abs(mainVideo.currentTime - playerB.getCurrentTime()) > m) {
+            if (Math.abs(mainVideo.currentTime - playerA.getCurrentTime()) > m) {
+                if (mainVideo.currentTime - playerA.getCurrentTime() > 0) {
+                    videoA.playbackRate = mainVideo.playbackRate + Math.min(15, mainVideo.currentTime - playerA.getCurrentTime());
+                } else {
+                    videoA.playbackRate = mainVideo.playbackRate + Math.max(-0.93, mainVideo.currentTime - playerA.getCurrentTime());
+                }
+            } else {
+                videoA.playbackRate = mainVideo.playbackRate;
+            }
+            if (Math.abs(mainVideo.currentTime - playerB.getCurrentTime()) > m) {
 
-            //     if (mainVideo.currentTime - playerB.getCurrentTime() > 0) {
-            //         videoB.playbackRate = mainVideo.playbackRate + Math.min(15, mainVideo.currentTime - playerB.getCurrentTime());
-            //     } else {
-            //         videoB.playbackRate = mainVideo.playbackRate + Math.max(-0.93, mainVideo.currentTime - playerB.getCurrentTime());
-            //     }
-            // } else {
-            //     videoB.playbackRate = mainVideo.playbackRate;
-            // }
-            // try {
-            //     if (Math.abs((mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime()) > m) {
-            //         if ((mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime() > 0) {
-            //             try {
-            //                 video3[soundIndex].playbackRate = mainVideo.playbackRate + Math.min(15, (mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
-            //             } catch (erro) { }
-            //         } else {
-            //             try {
-            //                 video3[soundIndex].playbackRate = mainVideo.playbackRate + Math.max(-0.93, (mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
-            //             } catch (erro) { }
-            //         }
-            //     } else {
-            //         try {
-            //             video3[soundIndex].playbackRate = mainVideo.playbackRate;
-            //         } catch (erro) { }
-            //     }
-            // } catch (error) { }
-            // try {
-            //     if (mainVideo.currentTime >= tempoDeInicioP3[soundIndex + 1]) {
-            //         if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
-            //             DeleteCurrentSound();
-            //             soundIndex = GetSoundIndex();
-            //             ChangeToNextSound();
-            //         }
-            //     }
-            // } catch (error) { }
+                if (mainVideo.currentTime - playerB.getCurrentTime() > 0) {
+                    videoB.playbackRate = mainVideo.playbackRate + Math.min(15, mainVideo.currentTime - playerB.getCurrentTime());
+                } else {
+                    videoB.playbackRate = mainVideo.playbackRate + Math.max(-0.93, mainVideo.currentTime - playerB.getCurrentTime());
+                }
+            } else {
+                videoB.playbackRate = mainVideo.playbackRate;
+            }
+            try {
+                if (Math.abs((mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime()) > m) {
+                    if ((mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime() > 0) {
+                        try {
+                            video3[soundIndex].playbackRate = mainVideo.playbackRate + Math.min(15, (mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
+                        } catch (erro) { }
+                    } else {
+                        try {
+                            video3[soundIndex].playbackRate = mainVideo.playbackRate + Math.max(-0.93, (mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
+                        } catch (erro) { }
+                    }
+                } else {
+                    try {
+                        video3[soundIndex].playbackRate = mainVideo.playbackRate;
+                    } catch (erro) { }
+                }
+            } catch (error) { }
+            try {
+                if (mainVideo.currentTime >= tempoDeInicioP3[soundIndex + 1]) {
+                    if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
+                        DeleteCurrentSound();
+                        soundIndex = GetSoundIndex();
+                        ChangeToNextSound();
+                    }
+                }
+            } catch (error) { }
             // if (mainVideo.clientWidth != cWidth) {
             //     mainVideo.style.left = -5000 + "px";
             //     ResizeCanvas();
             // }
-            // if (mainVideo.videoHeight != vHeigth || videoB.videoHeight != vBHeigth || videoA.videoHeight != vAHeigth) {
-            //     ResizeCanvas();
-            // }
+            if (mainVideo.videoHeight != vHeigth || videoB.videoHeight != vBHeigth || videoA.videoHeight != vAHeigth) {
+                ResizeCanvas();
+            }
             setTimeout(update, 1000 / 30.0);
         }
     }
