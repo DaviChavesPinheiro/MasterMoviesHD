@@ -210,6 +210,13 @@ function decodeVideo() {
             if (video3[i]) console.log("Obtained: video3[" + i + "]"); else console.log("Failed: video3[" + i + "]");
             video3[i].index = i;
             video3[i].waiting = onwaitingPlayer3;
+            video3[i].addEventListener("ended", function(){
+                if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
+                    DeleteCurrentSound();
+                    soundIndex = GetSoundIndex();
+                    ChangeToNextSound();
+                }
+            })
             if (lowPlayBackRate)
                 video3[i].playbackRate = 0.07;
         }
@@ -310,15 +317,15 @@ function decodeVideo() {
                     } catch (erro) { }
                 }
             } catch (error) { }
-            try {
-                if (mainVideo.currentTime >= tempoDeInicioP3[soundIndex + 1]) {
-                    if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
-                        DeleteCurrentSound();
-                        soundIndex = GetSoundIndex();
-                        ChangeToNextSound();
-                    }
-                }
-            } catch (error) { }
+            // try {
+            //     if (mainVideo.currentTime >= tempoDeInicioP3[soundIndex + 1]) {
+            //         if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
+            //             DeleteCurrentSound();
+            //             soundIndex = GetSoundIndex();
+            //             ChangeToNextSound();
+            //         }
+            //     }
+            // } catch (error) { }
             // if (mainVideo.clientWidth != cWidth) {
             //     mainVideo.style.left = -5000 + "px";
             //     ResizeCanvas();
