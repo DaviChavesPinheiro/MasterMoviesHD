@@ -1,10 +1,7 @@
 window.onload = () => {
     createDecodeElement()
-
     createStatusElement()
-
     createPanelElement()
-
 }
 
 function createDecodeElement(){
@@ -78,17 +75,19 @@ function decodeVideo() {
 
     let rect1, rect2, rect3, rect4;
 
-    let soundIndex;
-
     const mainVideo = getMainVideo();
+    mainVideo.addEventListener('play', play);
+    mainVideo.addEventListener('pause', pause);
+    mainVideo.addEventListener('volumeChange', volumeChange);
+    mainVideo.addEventListener('waiting', waiting);
+    mainVideo.addEventListener('seeked', seeked);
+
     let videoA, videoB;
     let video3 = [];
     let playerA, playerB;
     let player3 = [];
 
     let intervalID
-
-    // let container = document.querySelector("#container")
 
     let cHeigth = mainVideo.clientHeight;
     let cWidth = mainVideo.clientWidth;
@@ -104,16 +103,10 @@ function decodeVideo() {
     const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-    soundIndex = GetSoundIndex();
+    let soundIndex = GetSoundIndex();
 
     const canvas = GetCanvas("canvas", 10);
-    const ctx1 = canvas.getContext('2d');
-
-    mainVideo.addEventListener('play', play);
-    mainVideo.addEventListener('pause', pause);
-    mainVideo.addEventListener('volumeChange', volumeChange);
-    mainVideo.addEventListener('waiting', waiting);
-    mainVideo.addEventListener('seeked', seeked);
+    const ctx = canvas.getContext('2d');
 
     const m = 0.05;
 
@@ -123,7 +116,7 @@ function decodeVideo() {
 
     window.onYouTubeIframeAPIReady = function () {
         pause()
-        
+
         playerA = GetPlayer(URL_Player1, PlayerAReady, 144, 360, ResizeCanvas);
         playerB = GetPlayer(URL_Player2, PlayerBReady, 144, 360, ResizeCanvas);
 
@@ -134,17 +127,23 @@ function decodeVideo() {
             vAWidth = videoA.videoWidth;
             videoA.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
             videoA.muted = true;
-            playerA.playVideo();
             videoA.style.visibility = "hidden"
             videoA.addEventListener('resize', function(){
                 ResizeCanvas()
             })
             videoA.addEventListener('pause', function(){
-                DrawCanvas()
+                if (videoA && videoB) DrawCanvas()
             })
-            videoA.addEventListener('load', function(){
-                DrawCanvas()
+            playerA.addEventListener('load', function(){
+                console.log("Player A load")
+                playerA.playVideo();
             })
+            // videoA.addEventListener('canplay', function(){
+            //     if (videoA && videoB) DrawCanvas()
+            // })
+            // videoA.addEventListener('canplaythrough', function(){
+            //     if (videoA && videoB) DrawCanvas()
+            // })
         }).catch(console.error)
 
         getVideo(URL_Player2).then(video => {
@@ -154,17 +153,22 @@ function decodeVideo() {
             vBWidth = videoB.videoWidth;
             videoB.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
             videoB.muted = true;
-            playerB.playVideo();
             videoB.style.visibility = "hidden"
             videoB.addEventListener('resize', function(){
                 ResizeCanvas()
             })
             videoB.addEventListener('pause', function(){
-                DrawCanvas()
+                if (videoA && videoB) DrawCanvas()
             })
-            videoB.addEventListener('load', function(){
-                DrawCanvas()
+            playerB.addEventListener('load', function(){
+                playerB.playVideo();
             })
+            // videoB.addEventListener('canplay', function(){
+            //     if (videoA && videoB) DrawCanvas()
+            // })
+            // videoB.addEventListener('canplaythrough', function(){
+            //     if (videoA && videoB) DrawCanvas()
+            // })
         }).catch(console.error)
 
         GetTwoSounds();
@@ -190,7 +194,7 @@ function decodeVideo() {
         const video = document.getElementsByTagName("video")[0];
         video.muted = true;
         video.style.visibility = "hidden"
-        mainVideo.playbackRate = 1
+        video.playbackRate = 1
         return video
     }
 
@@ -261,10 +265,10 @@ function decodeVideo() {
 
 
     function DrawCanvas() {
-        ctx1.drawImage(videoB, rect1[0], rect1[1], rect1[2], rect1[3], rect1[4], rect1[5], rect1[6], rect1[7]);
-        ctx1.drawImage(videoA, rect2[0], rect2[1], rect2[2], rect2[3], rect2[4], rect2[5], rect2[6], rect2[7]);
-        ctx1.drawImage(videoB, rect3[0], rect3[1], rect3[2], rect3[3], rect3[4], rect3[5], rect3[6], rect3[7]);
-        ctx1.drawImage(videoA, rect4[0], rect4[1], rect4[2], rect4[3], rect4[4], rect4[5], rect4[6], rect4[7]);
+        ctx.drawImage(videoB, rect1[0], rect1[1], rect1[2], rect1[3], rect1[4], rect1[5], rect1[6], rect1[7]);
+        ctx.drawImage(videoA, rect2[0], rect2[1], rect2[2], rect2[3], rect2[4], rect2[5], rect2[6], rect2[7]);
+        ctx.drawImage(videoB, rect3[0], rect3[1], rect3[2], rect3[3], rect3[4], rect3[5], rect3[6], rect3[7]);
+        ctx.drawImage(videoA, rect4[0], rect4[1], rect4[2], rect4[3], rect4[4], rect4[5], rect4[6], rect4[7]);
     }
 
     function ResizeCanvas() {
@@ -333,40 +337,56 @@ function decodeVideo() {
     }
 
     function pause() {
-        mainVideo.pause();
-        mainVideo.muted = true;
-        if (playerA) {
+        console.log("Pause")
+
+        if(mainVideo){
+            mainVideo.pause();
+            mainVideo.muted = true;
+        }
+        if (videoA) {
             playerA.pauseVideo();
             playerA.seekTo(mainVideo.currentTime, true);
+            if (videoA){
+                videoA.muted = true;
+            }
         }
-        if (playerB) {
+        if (videoB) {
             playerB.pauseVideo();
             playerB.seekTo(mainVideo.currentTime, true);
+            if (videoB){   
+                videoB.muted = true;
+            }
         }
-        if (player3[soundIndex]) {
+        if (video3[soundIndex]) {
             player3[soundIndex].pauseVideo();
             player3[soundIndex].seekTo(mainVideo.currentTime - tempoDeInicioP3[soundIndex], true);
-            player3[soundIndex].setVolume(mainVideo.volume * 100);
+            player3[soundIndex].setVolume(mainVideo.volume * 100); //todo remover? parece n servir para nada
         }
-        if (videoA)
-            videoA.muted = true;
-        if (videoB)
-            videoB.muted = true;
-        clearInterval(intervalID)
+        
+        clearInterval(intervalID) //Para o Lopping do Update
+        //todo tentar transformar isso em eventos.
         setTimeout(ResizeCanvas, 1000);
-        // setTimeout(function () { if (videoA && videoB) DrawCanvas(); }, 1000);
+        setTimeout(function () { if (videoA && videoB) DrawCanvas(); }, 1000);
     }
 
-    function volumeChange() {
-        if (player3[soundIndex]) {
-            mainVideo.muted = true;
-            videoA.muted = true;
-            videoB.muted = true;
+    function volumeChange() { //Seta o volume do audio para o volume do mainVideo e muta os outros videos.
+        console.log("OnVolumeChange")
+        if (player3[soundIndex] && mainVideo) {
             player3[soundIndex].setVolume(mainVideo.volume * 100);
+        }
+        if(mainVideo){
+            mainVideo.muted = true;
+        }
+        if (videoA) {
+            videoA.muted = true;
+        }
+        if (videoB) {
+            videoB.muted = true;
         }
     }
 
     function waiting() {
+        console.log("OnWaiting")
         pause();
     }
     function onwaitingPlayer3() {
@@ -376,7 +396,7 @@ function decodeVideo() {
     }
 
     function seeked() {
-        console.log("seeked: " + GetSoundIndex() + " " + soundIndex);
+        console.log("OnSeeked")
         pause();
 
         const newIndex = GetSoundIndex();
@@ -390,10 +410,9 @@ function decodeVideo() {
         }
 
         ResizeCanvas();
-        if (videoA && videoB)
-            DrawCanvas();
-
-        console.log("seeked END");
+        if (videoA && videoB) {
+            DrawCanvas()
+        }
     }
 
     function GetSoundIndex() {
