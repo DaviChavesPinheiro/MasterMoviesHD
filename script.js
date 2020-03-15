@@ -71,10 +71,10 @@ function decodeVideo() {
     const config = getConfig()
     if(!config) return
 
-    const URL_Player1 = config.URL_Player1 || ""
-    const URL_Player2 = config.URL_Player2 || ""
-    const URLS_player3 = config.URLS_player3 || []
-    const tempoDeInicioP3 = config.tempoDeInicioP3 || []
+    const URL_Player1 = config.URL_Player1
+    const URL_Player2 = config.URL_Player2
+    const URLS_player3 = config.URLS_player3
+    const tempoDeInicioP3 = config.tempoDeInicioP3
 
     let rect1, rect2, rect3, rect4;
 
@@ -86,7 +86,9 @@ function decodeVideo() {
     let playerA, playerB;
     let player3 = [];
 
-    let container = document.querySelector("#container")
+    let intervalID
+
+    // let container = document.querySelector("#container")
 
     let cHeigth = mainVideo.clientHeight;
     let cWidth = mainVideo.clientWidth;
@@ -107,14 +109,13 @@ function decodeVideo() {
     const canvas = GetCanvas("canvas", 10);
     const ctx1 = canvas.getContext('2d');
 
-    mainVideo.addEventListener('play', update, 0);
-    mainVideo.onplay = play;
-    mainVideo.onpause = pause;
-    mainVideo.onvolumechange = volumeChange;
-    mainVideo.onwaiting = waiting;
-    mainVideo.onseeked = seeked;
+    mainVideo.addEventListener('play', play);
+    mainVideo.addEventListener('pause', pause);
+    mainVideo.addEventListener('volumeChange', volumeChange);
+    mainVideo.addEventListener('waiting', waiting);
+    mainVideo.addEventListener('seeked', seeked);
 
-    const m = 0.002;
+    const m = 0.05;
 
     document.querySelector("#movie_player").addEventListener('resize', function(event){ResizeCanvas()})
     document.querySelector("video").addEventListener('resize', function(event){ResizeCanvas()})
@@ -283,7 +284,6 @@ function decodeVideo() {
                 videoA.playbackRate = mainVideo.playbackRate;
             }
             if (Math.abs(mainVideo.currentTime - playerB.getCurrentTime()) > m) {
-
                 if (mainVideo.currentTime - playerB.getCurrentTime() > 0) {
                     videoB.playbackRate = mainVideo.playbackRate + Math.min(15, mainVideo.currentTime - playerB.getCurrentTime());
                 } else {
@@ -295,37 +295,14 @@ function decodeVideo() {
             try {
                 if (Math.abs((mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime()) > m) {
                     if ((mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime() > 0) {
-                        try {
-                            video3[soundIndex].playbackRate = mainVideo.playbackRate + Math.min(15, (mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
-                        } catch (erro) { }
+                        video3[soundIndex].playbackRate = mainVideo.playbackRate + Math.min(15, (mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
                     } else {
-                        try {
-                            video3[soundIndex].playbackRate = mainVideo.playbackRate + Math.max(-0.93, (mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
-                        } catch (erro) { }
+                        video3[soundIndex].playbackRate = mainVideo.playbackRate + Math.max(-0.93, (mainVideo.currentTime - tempoDeInicioP3[soundIndex]) - player3[soundIndex].getCurrentTime());
                     }
                 } else {
-                    try {
-                        video3[soundIndex].playbackRate = mainVideo.playbackRate;
-                    } catch (erro) { }
+                    video3[soundIndex].playbackRate = mainVideo.playbackRate;
                 }
             } catch (error) { }
-            // try {
-            //     if (mainVideo.currentTime >= tempoDeInicioP3[soundIndex + 1]) {
-            //         if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
-            //             DeleteCurrentSound();
-            //             soundIndex = GetSoundIndex();
-            //             ChangeToNextSound();
-            //         }
-            //     }
-            // } catch (error) { }
-            // if (mainVideo.clientWidth != cWidth) {
-            //     mainVideo.style.left = -5000 + "px";
-            //     ResizeCanvas();
-            // }
-            // if (mainVideo.videoHeight != vHeigth || videoB.videoHeight != vBHeigth || videoA.videoHeight != vAHeigth) {
-            //     ResizeCanvas();
-            // }
-            setTimeout(update, 1000 / 30.0);
         }
     }
 
@@ -337,12 +314,9 @@ function decodeVideo() {
                 player3[soundIndex].playVideo();
                 player3[soundIndex].setVolume(mainVideo.volume * 100);
             }
+            intervalID = setInterval(update, 1000 / 30.0)
         } else {
-            mainVideo.pause();
-            playerA.pauseVideo();
-            playerB.pauseVideo();
-            if (player3[soundIndex])
-                player3[soundIndex].pauseVideo();
+            pause()
         }
 
     }
@@ -367,6 +341,7 @@ function decodeVideo() {
             videoA.muted = true;
         if (videoB)
             videoB.muted = true;
+        clearInterval(intervalID)
         setTimeout(ResizeCanvas, 1000);
         setTimeout(function () { if (videoA && videoB) DrawCanvas(); }, 1000);
     }
