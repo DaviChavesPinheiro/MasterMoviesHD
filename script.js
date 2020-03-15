@@ -86,9 +86,6 @@ function decodeVideo() {
     let playerA, playerB;
     let player3 = [];
 
-    if (mainVideo.currentTime < 60 * 1 + 30)
-        mainVideo.currentTime = 0;
-
     let container = document.querySelector("#container")
 
     let cHeigth = mainVideo.clientHeight;
@@ -114,18 +111,13 @@ function decodeVideo() {
     mainVideo.onplay = play;
     mainVideo.onpause = pause;
     mainVideo.onvolumechange = volumeChange;
-    mainVideo.waiting = waiting;
+    mainVideo.onwaiting = waiting;
     mainVideo.onseeked = seeked;
 
     const m = 0.002;
 
-    document.querySelector("#movie_player").addEventListener('resize', function(event){
-        ResizeCanvas()
-    })
-
-    document.querySelector("video").addEventListener('resize', function(event){
-        ResizeCanvas()
-    })
+    document.querySelector("#movie_player").addEventListener('resize', function(event){ResizeCanvas()})
+    document.querySelector("video").addEventListener('resize', function(event){ResizeCanvas()})
 
 
     window.onYouTubeIframeAPIReady = function () {
@@ -136,7 +128,7 @@ function decodeVideo() {
 
         getVideo(URL_Player1).then(video => {
             videoA = video
-            videoA.waiting = waiting;
+            videoA.onwaiting = waiting;
             vAHeigth = videoA.videoHeight;
             vAWidth = videoA.videoWidth;
             videoA.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
@@ -150,7 +142,7 @@ function decodeVideo() {
 
         getVideo(URL_Player2).then(video => {
             videoB = video
-            videoB.waiting = waiting;
+            videoB.onwaiting = waiting;
             vBHeigth = videoB.videoHeight;
             vBWidth = videoB.videoWidth;
             videoB.onseeked = function () { if (videoA && videoB) DrawCanvas(); };
@@ -209,7 +201,7 @@ function decodeVideo() {
             video3[i] = (iframe.contentDocument || iframe.contentWindow.document).getElementsByTagName("video")[0];
             if (video3[i]) console.log("Obtained: video3[" + i + "]"); else console.log("Failed: video3[" + i + "]");
             video3[i].index = i;
-            video3[i].waiting = onwaitingPlayer3;
+            video3[i].onwaiting = onwaitingPlayer3;
             video3[i].addEventListener("ended", function(){
                 if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
                     DeleteCurrentSound();
@@ -509,17 +501,22 @@ function decodeVideo() {
 function setPanelContent(data) {
     const p = document.querySelector("#panel")
     p.innerHTML = ""
+    let key
+    let value
     Object.entries(data).forEach(entrie => {
-        p.innerHTML += `<p>${entrie[0]}: <span style="color: ${existsOrError(entrie[1]) == 'OK!' ? "lawngreen" : "red"};">${existsOrError(entrie[1])}</span></p>`
-
+        key = entrie[0]
+        value = entrie[1]
+        p.innerHTML += `
+        <p>${entrie[0]}: <span style="color: ${exists(entrie[1]) ? "lawngreen" : "red"};">${exists(entrie[1])? "OK!" : "ERROR!"}</span></p>
+        `
     })
 }
 
-function existsOrError(value, msg){
-    if(!value) return "Error"
-    if(Array.isArray(value) && value.length === 0) return "Error"
-    if(typeof value === 'string' && !value.trim()) return "Error"
-    return "OK!"
+function exists(value){
+    if(!value) return false
+    if(Array.isArray(value) && value.length === 0) return false
+    if(typeof value === 'string' && !value.trim()) return false
+    return true
 }
 
 function getConfig(){

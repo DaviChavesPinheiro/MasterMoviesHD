@@ -1,7 +1,7 @@
 {
     "name": "MasterMoviesHD",
     "version": "1.0.0",
-    "description": "Watch Movies Online",
+    "description": "Watch Online Movies",
     "manifest_version": 2,
     "content_scripts": [
         {
