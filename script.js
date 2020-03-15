@@ -117,13 +117,13 @@ function decodeVideo() {
 
     const m = 0.05;
 
-    document.querySelector("#movie_player").addEventListener('resize', function(event){ResizeCanvas()})
-    document.querySelector("video").addEventListener('resize', function(event){ResizeCanvas()})
+    document.querySelector("#movie_player").addEventListener('resize', function(){ResizeCanvas()})
+    document.querySelector("video").addEventListener('resize', function(){ResizeCanvas()})
 
 
     window.onYouTubeIframeAPIReady = function () {
-        console.log("Window onYouTubeIframeAPIReady")
-
+        pause()
+        
         playerA = GetPlayer(URL_Player1, PlayerAReady, 144, 360, ResizeCanvas);
         playerB = GetPlayer(URL_Player2, PlayerBReady, 144, 360, ResizeCanvas);
 
@@ -136,8 +136,14 @@ function decodeVideo() {
             videoA.muted = true;
             playerA.playVideo();
             videoA.style.visibility = "hidden"
-            videoA.addEventListener('resize', function(event){
+            videoA.addEventListener('resize', function(){
                 ResizeCanvas()
+            })
+            videoA.addEventListener('pause', function(){
+                DrawCanvas()
+            })
+            videoA.addEventListener('load', function(){
+                DrawCanvas()
             })
         }).catch(console.error)
 
@@ -150,8 +156,14 @@ function decodeVideo() {
             videoB.muted = true;
             playerB.playVideo();
             videoB.style.visibility = "hidden"
-            videoB.addEventListener('resize', function(event){
+            videoB.addEventListener('resize', function(){
                 ResizeCanvas()
+            })
+            videoB.addEventListener('pause', function(){
+                DrawCanvas()
+            })
+            videoB.addEventListener('load', function(){
+                DrawCanvas()
             })
         }).catch(console.error)
 
@@ -178,19 +190,20 @@ function decodeVideo() {
         const video = document.getElementsByTagName("video")[0];
         video.muted = true;
         video.style.visibility = "hidden"
+        mainVideo.playbackRate = 1
         return video
     }
 
 
     function getVideo(url) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const iframe = document.getElementById(url);
             iframe.onload = function () {
                 video = (iframe.contentDocument || iframe.contentWindow.document).getElementsByTagName("video")[0];
                 if (video){
                     resolve(video)
                 } else {
-                    throw new Error("VideoA não encontrado.");
+                    throw new Error("Video " + url + "não encontrado.")
                 }
             }
         })
@@ -307,13 +320,11 @@ function decodeVideo() {
     }
 
     function play() {
-        if (playerA.getPlayerState() != YT.PlayerState.BUFFERING && playerB.getPlayerState() != YT.PlayerState.BUFFERING && player3[soundIndex].getPlayerState() != YT.PlayerState.BUFFERING) {
-            playerA.playVideo();
-            playerB.playVideo();
-            if (player3[soundIndex]) {
-                player3[soundIndex].playVideo();
-                player3[soundIndex].setVolume(mainVideo.volume * 100);
-            }
+        if (playerA && playerB && player3[soundIndex] && playerA.getPlayerState() != YT.PlayerState.BUFFERING && playerB.getPlayerState() != YT.PlayerState.BUFFERING && player3[soundIndex].getPlayerState() != YT.PlayerState.BUFFERING) {
+            playerA.playVideo()
+            playerB.playVideo()
+            player3[soundIndex].playVideo()
+            player3[soundIndex].setVolume(mainVideo.volume * 100)
             intervalID = setInterval(update, 1000 / 30.0)
         } else {
             pause()
@@ -343,7 +354,7 @@ function decodeVideo() {
             videoB.muted = true;
         clearInterval(intervalID)
         setTimeout(ResizeCanvas, 1000);
-        setTimeout(function () { if (videoA && videoB) DrawCanvas(); }, 1000);
+        // setTimeout(function () { if (videoA && videoB) DrawCanvas(); }, 1000);
     }
 
     function volumeChange() {
