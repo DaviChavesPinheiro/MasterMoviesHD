@@ -3,7 +3,7 @@ window.onload = () => {
     createStatusElement()
     createPanelElement()
 }
-
+let ready = []
 let isDecoded = false
 const decodeElement = document.createElement("button")
 const statusElement = document.createElement("button")
@@ -61,9 +61,6 @@ function setLoadingState(canvas){
         decodeVideo()
     }
 
-    // setTimeout(function(){ 
-    //     setDecodedState()
-    // }, 4000)
 }
 function setDecodedState(){
     decodeElement.classList.remove("loading")
@@ -83,23 +80,10 @@ function setUndecodedState(canvas){
 function togglePanel() {
     panelElement.classList.toggle("hidden")
 }
-let ready = []
-function setReadyElements(element){
-    console.log("setReadyElements:", element)
-    if(!ready.includes(element)){
-        ready.push(element)
-    }
-
-    if(!decodeElement.classList.contains("decoded")){ //Se todos os elementos do importantElements ja estiverem prontos, setDecodedState(), caso !decoded.
-        const importantElements = ["mainVideo", "videoA", "videoB", "video3"]
-        if(importantElements.every(el => ready.includes(el))){
-            console.log(ready)
-            setDecodedState()
-            document.querySelector("video").pause()
-        }
-    }
-}
-
+// ************************************************************************************************************************************
+// ************************************************************************************************************************************
+// ************************************************************************************************************************************
+// ************************************************************************************************************************************
 function decodeVideo() {
     const config = getConfig()
     if(!config) return
@@ -112,6 +96,10 @@ function decodeVideo() {
     let rect1, rect2, rect3, rect4;
 
     const mainVideo = getMainVideo();
+    if(!mainVideo) {
+        console.log("VIDEO NÃO ENCONTRADO NESSA PÁGINA.")
+        return
+    }
     mainVideo.addEventListener('play', play);
     mainVideo.addEventListener('pause', pause);
     mainVideo.addEventListener('volumeChange', volumeChange);
@@ -151,11 +139,12 @@ function decodeVideo() {
 
 
     window.onYouTubeIframeAPIReady = function () {
-        pause()
+        mainVideo.pause()
 
         playerA = GetPlayer(URL_Player1, PlayerAReady, 144, 360, ResizeCanvas);
         playerB = GetPlayer(URL_Player2, PlayerBReady, 144, 360, ResizeCanvas);
 
+        // GET VIDEOA
         getVideo(URL_Player1).then(video => {
             videoA = video
             videoA.onwaiting = waiting;
@@ -175,7 +164,7 @@ function decodeVideo() {
                 setReadyElements("videoA")
             })
         }).catch(console.error)
-
+        // GET VIDEOB
         getVideo(URL_Player2).then(video => {
             videoB = video
             videoB.onwaiting = waiting;
@@ -236,33 +225,6 @@ function decodeVideo() {
                 }
             }
         })
-    }
-
-    function GetVideo3(i, lowPlayBackRate) {
-        const iframe = document.getElementById(player3[i].getIframe().id);
-        iframe.onload = function () {
-            video3[i] = (iframe.contentDocument || iframe.contentWindow.document).getElementsByTagName("video")[0];
-            if (!video3[i]){
-                console.log("Failed: video3[" + i + "]")
-                return
-            }
-            console.log("GetVideo3: " + i + " OK!")
-            video3[i].index = i;
-            video3[i].onwaiting = onwaitingPlayer3;
-            video3[i].addEventListener("ended", function(){
-                if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
-                    DeleteCurrentSound();
-                    soundIndex = GetSoundIndex();
-                    ChangeToNextSound();
-                }
-            })
-            if (lowPlayBackRate){
-                video3[i].playbackRate = 0.07;
-            }
-            video3[i].addEventListener('canplaythrough', function(){
-                setReadyElements("video3")
-            })
-        }
     }
 
     function PlayerAReady() {
@@ -468,8 +430,40 @@ function decodeVideo() {
     function GetTwoSounds() {
         player3[soundIndex] = GetPlayer(URLS_player3[soundIndex], function () { player3[soundIndex].playVideo(); player3[soundIndex].setVolume(0); }, 144, 360);
         player3[soundIndex + 1] = GetPlayer(URLS_player3[soundIndex + 1], function () { player3[soundIndex + 1].playVideo(); player3[soundIndex + 1].setVolume(0); }, 144, 360);
-        GetVideo3(soundIndex);
-        GetVideo3(soundIndex + 1, true);
+        getVideo(URLS_player3[soundIndex]).then(video => {
+            video3[soundIndex] = video
+            video3[soundIndex].index = soundIndex
+            video3[soundIndex].onwaiting = onwaitingPlayer3
+            video3[soundIndex].addEventListener("ended", function(){
+                if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
+                    DeleteCurrentSound()
+                    soundIndex = GetSoundIndex()
+                    ChangeToNextSound()
+                }
+            })
+            video3[soundIndex].addEventListener('canplaythrough', function(){
+                setReadyElements("video3")
+            })
+        })
+
+        getVideo(URLS_player3[soundIndex + 1]).then(video => {
+            video3[soundIndex + 1] = video
+            video3[soundIndex + 1].index = soundIndex + 1
+            video3[soundIndex + 1].onwaiting = onwaitingPlayer3
+            video3[soundIndex + 1].addEventListener("ended", function(){
+                if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
+                    DeleteCurrentSound()
+                    soundIndex = GetSoundIndex()
+                    ChangeToNextSound()
+                }
+            })
+            video3[soundIndex + 1].playbackRate = 0.07
+
+            video3[soundIndex + 1].addEventListener('canplaythrough', function(){
+                setReadyElements("video3")
+            })
+        })
+        
         console.log("GetTwoSounds");
     }
 
@@ -479,7 +473,23 @@ function decodeVideo() {
         video3[soundIndex].dontPauseOnonwaiting = true;
         player3[soundIndex].seekTo(mainVideo.currentTime - tempoDeInicioP3[soundIndex], true);
         player3[soundIndex + 1] = GetPlayer(URLS_player3[soundIndex + 1], function () { player3[soundIndex + 1].playVideo(); player3[soundIndex + 1].setVolume(0); }, 144, 360);
-        GetVideo3(soundIndex + 1, true);
+        getVideo(URLS_player3[soundIndex + 1]).then(video => {
+            video3[soundIndex + 1] = video
+            video3[soundIndex + 1].index = soundIndex + 1
+            video3[soundIndex + 1].onwaiting = onwaitingPlayer3
+            video3[soundIndex + 1].addEventListener("ended", function(){
+                if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
+                    DeleteCurrentSound()
+                    soundIndex = GetSoundIndex()
+                    ChangeToNextSound()
+                }
+            })
+            video3[soundIndex + 1].playbackRate = 0.07
+
+            video3[soundIndex + 1].addEventListener('canplaythrough', function(){
+                setReadyElements("video3")
+            })
+        })
         play();
     }
 
@@ -532,6 +542,23 @@ function decodeVideo() {
             }, 400);
         }, 500);
     }
+
+    function setReadyElements(element){
+        console.log("setReadyElements:", element)
+        if(!ready.includes(element)){
+            ready.push(element)
+        }
+
+        if(!decodeElement.classList.contains("decoded")){ //Se todos os elementos do importantElements ja estiverem prontos, setDecodedState(), caso !decoded.
+            const importantElements = ["mainVideo", "videoA", "videoB", "video3"]
+            if(importantElements.every(el => ready.includes(el))){
+                console.log(ready)
+                setDecodedState()
+                pause()
+            }
+        }
+    }
+
 
     setInterval(function(){setPanelContent({URL_Player1,URL_Player2,URLS_player3,tempoDeInicioP3,mainVideo,videoA,videoB}), 1000})
 }
