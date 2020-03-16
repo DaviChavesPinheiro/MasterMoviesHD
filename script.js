@@ -4,64 +4,75 @@ window.onload = () => {
     createPanelElement()
 }
 
+let isDecoded = false
+const decodeElement = document.createElement("button")
+const statusElement = document.createElement("button")
+const panelElement = document.createElement("div")
+
 function createDecodeElement(){
-    const d = document.createElement("button")
-    d.id = "decode"
-    d.classList.add("mm")
-    d.classList.add("button")
-    d.textContent = "DECODIFICAR"
-    d.addEventListener("click", decode)
-    document.querySelector(".ytp-chrome-controls .ytp-right-controls").prepend(d)
+    decodeElement.id = "decode"
+    decodeElement.classList.add("mm")
+    decodeElement.classList.add("button")
+    decodeElement.classList.add("undecoded")
+    decodeElement.textContent = "DECODE"
+    decodeElement.addEventListener("click", decode)
+    document.querySelector(".ytp-chrome-controls .ytp-right-controls").prepend(decodeElement)
 }
 
 function createStatusElement(){
-    const s = document.createElement("button")
-    s.id = "status"
-    s.classList.add("mm")
-    s.classList.add("button")
-    s.classList.add("hidden")
-    s.textContent = "STATUS"
-    s.addEventListener("click", status)
-    document.querySelector(".ytp-chrome-controls .ytp-left-controls").append(s)
+    statusElement.id = "status"
+    statusElement.classList.add("mm")
+    statusElement.classList.add("button")
+    statusElement.classList.add("hidden")
+    statusElement.textContent = "STATUS"
+    statusElement.addEventListener("click", status)
+    document.querySelector(".ytp-chrome-controls .ytp-left-controls").append(statusElement)
 }
 
 function createPanelElement(){
-    const p = document.createElement("div")
-    p.id = "panel"
-    p.classList.add("mm")
-    p.classList.add("panel")
-    p.classList.add("hidden")
-    document.querySelector("#movie_player").append(p)
+    panelElement.id = "panel"
+    panelElement.classList.add("mm")
+    panelElement.classList.add("panel")
+    panelElement.classList.add("hidden")
+    document.querySelector("#movie_player").append(panelElement)
 }
 
-
-
 function decode() {
-    const d = document.querySelector("#decode")
-    const s = document.querySelector("#status")
-    const c = document.querySelector("#canvas")
-    const p = document.querySelector("#panel")
+    const canvas = document.querySelector("#canvas")
 
-    if(!d.classList.contains("decoded")){ //VAI CODIFICAR
-        if (!c) {
+    if (decodeElement.classList.contains("undecoded")) { //DECODE:
+        decodeElement.classList.remove("undecoded")
+        decodeElement.classList.add("loading")
+        statusElement.classList.remove("hidden")
+        if(canvas){canvas.classList.remove("hidden")}//todo pensar em trocar isso para o final do Loading...
+        decodeElement.textContent = "DECODING..."
+
+        setTimeout(function(){ //WHEN LOADING FINISH:
+            decodeElement.classList.remove("loading")
+            decodeElement.classList.add("decoded")
+            decodeElement.textContent = "DECODED"
+        }, 4000)
+
+        if(!isDecoded){ //Caso seja a primeira vez, inicia a decodificao do video.
             decodeVideo()
         }
+    } else if(decodeElement.classList.contains("loading")){//WAITING TO DECODE
+        decodeElement.textContent = "DECODING... Wait"
+        console.log("Decoding... Please, wait :)")
+    } else if(decodeElement.classList.contains("decoded")){//UNDECODE:
+        decodeElement.classList.remove("decoded")
+        decodeElement.classList.add("undecoded")
+        statusElement.classList.add("hidden")
+        decodeElement.textContent = "DECODE"
+        panelElement.classList.add("hidden")
 
-        d.classList.add("decoded")
-        s.classList.remove("hidden")
-        if(c)
-            c.classList.remove("hidden")
-    } else {                                  //DESLIGA A CODIFICACAO
-        d.classList.remove("decoded")
-        s.classList.add("hidden")
-        c.classList.add("hidden")
-        p.classList.add("hidden")
+        if(canvas){canvas.classList.add("hidden")}
     }
+    isDecoded = true
 }
 
 function status() {
-    const p = document.querySelector("#panel")
-    p.classList.toggle("hidden")
+    panelElement.classList.toggle("hidden")
 }   
 
 function decodeVideo() {
@@ -504,15 +515,15 @@ function decodeVideo() {
 }
 
 function setPanelContent(data) {
-    const p = document.querySelector("#panel")
-    p.innerHTML = ""
+    const panelElement = document.querySelector("#panel")
+    panelElement.innerHTML = ""
     let key
     let value
     Object.entries(data).forEach(entrie => {
         key = entrie[0]
         value = entrie[1]
-        p.innerHTML += `
-        <p>${entrie[0]}: <span style="color: ${exists(entrie[1]) ? "lawngreen" : "red"};">${exists(entrie[1])? "OK!" : "ERROR!"}</span></p>
+        panelElement.innerHTML += `
+        <panelElement>${entrie[0]}: <span style="color: ${exists(entrie[1]) ? "lawngreen" : "red"};">${exists(entrie[1])? "OK!" : "ERROR!"}</span></panelElement>
         `
     })
 }

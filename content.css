@@ -23,26 +23,22 @@
     position: absolute;
     top: 10px;
     right: 2px;
-    background-color: #f00;
     width: 6px;
     height: 6px;
     border-radius: 3px;
     line-height: normal;
 }
 
-.mm.button.decoded::after{
-    background-color: rgb(0, 214, 18);
+.mm.undecoded::after{
+    background-color: #f00;
 }
 
-#status.button::after{
-    content: '';
-    position: absolute;
-    top: 10px;
-    right: 2px;
-    height: 0px;
-    width: 0px;
-    border-radius: 0px;
-    line-height: normal;
+.mm.loading::after{
+    background-color: rgb(238, 255, 0);
+}
+
+.mm.decoded::after{
+    background-color: rgb(0, 214, 18);
 }
 
 .mm.hidden{
