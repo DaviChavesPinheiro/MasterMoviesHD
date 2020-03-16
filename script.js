@@ -25,7 +25,7 @@ function createStatusElement(){
     statusElement.classList.add("button")
     statusElement.classList.add("hidden")
     statusElement.textContent = "STATUS"
-    statusElement.addEventListener("click", status)
+    statusElement.addEventListener("click", togglePanel)
     document.querySelector(".ytp-chrome-controls .ytp-left-controls").append(statusElement)
 }
 
@@ -40,40 +40,65 @@ function createPanelElement(){
 function decode() {
     const canvas = document.querySelector("#canvas")
 
-    if (decodeElement.classList.contains("undecoded")) { //DECODE:
-        decodeElement.classList.remove("undecoded")
-        decodeElement.classList.add("loading")
-        statusElement.classList.remove("hidden")
-        if(canvas){canvas.classList.remove("hidden")}//todo pensar em trocar isso para o final do Loading...
-        decodeElement.textContent = "DECODING..."
-
-        setTimeout(function(){ //WHEN LOADING FINISH:
-            decodeElement.classList.remove("loading")
-            decodeElement.classList.add("decoded")
-            decodeElement.textContent = "DECODED"
-        }, 4000)
-
-        if(!isDecoded){ //Caso seja a primeira vez, inicia a decodificao do video.
-            decodeVideo()
-        }
-    } else if(decodeElement.classList.contains("loading")){//WAITING TO DECODE
+    if (decodeElement.classList.contains("undecoded")) { //Undecoded ------> Loading
+        setLoadingState(canvas)
+    } else if(decodeElement.classList.contains("loading")){//Please, wait.
         decodeElement.textContent = "DECODING... Wait"
-        console.log("Decoding... Please, wait :)")
-    } else if(decodeElement.classList.contains("decoded")){//UNDECODE:
-        decodeElement.classList.remove("decoded")
-        decodeElement.classList.add("undecoded")
-        statusElement.classList.add("hidden")
-        decodeElement.textContent = "DECODE"
-        panelElement.classList.add("hidden")
-
-        if(canvas){canvas.classList.add("hidden")}
+    } else if(decodeElement.classList.contains("decoded")){//Decoded ------> Undecoded
+        setUndecodedState(canvas)
     }
     isDecoded = true
 }
 
-function status() {
+function setLoadingState(canvas){
+    decodeElement.classList.remove("undecoded")
+    decodeElement.classList.add("loading")
+    statusElement.classList.remove("hidden")
+    if(canvas){canvas.classList.remove("hidden")}//todo pensar em trocar isso para o final do Loading...
+    decodeElement.textContent = "DECODING..."
+
+    if(!isDecoded){ //Caso seja a primeira vez, inicia a decodificao do video.
+        decodeVideo()
+    }
+
+    // setTimeout(function(){ 
+    //     setDecodedState()
+    // }, 4000)
+}
+function setDecodedState(){
+    decodeElement.classList.remove("loading")
+    decodeElement.classList.add("decoded")
+    decodeElement.textContent = "DECODED"
+}
+function setUndecodedState(canvas){
+    decodeElement.classList.remove("decoded")
+    decodeElement.classList.add("undecoded")
+    statusElement.classList.add("hidden")
+    decodeElement.textContent = "DECODE"
+    panelElement.classList.add("hidden")
+
+    if(canvas){canvas.classList.add("hidden")}
+}
+
+function togglePanel() {
     panelElement.classList.toggle("hidden")
-}   
+}
+let ready = []
+function setReadyElements(element){
+    console.log("setReadyElements:", element)
+    if(!ready.includes(element)){
+        ready.push(element)
+    }
+
+    if(!decodeElement.classList.contains("decoded")){ //Se todos os elementos do importantElements ja estiverem prontos, setDecodedState(), caso !decoded.
+        const importantElements = ["mainVideo", "videoA", "videoB", "video3"]
+        if(importantElements.every(el => ready.includes(el))){
+            console.log(ready)
+            setDecodedState()
+            document.querySelector("video").pause()
+        }
+    }
+}
 
 function decodeVideo() {
     const config = getConfig()
@@ -145,16 +170,10 @@ function decodeVideo() {
             videoA.addEventListener('pause', function(){
                 if (videoA && videoB) DrawCanvas()
             })
-            playerA.addEventListener('load', function(){
-                console.log("Player A load")
-                playerA.playVideo();
+            
+            videoA.addEventListener('canplaythrough', function(){
+                setReadyElements("videoA")
             })
-            // videoA.addEventListener('canplay', function(){
-            //     if (videoA && videoB) DrawCanvas()
-            // })
-            // videoA.addEventListener('canplaythrough', function(){
-            //     if (videoA && videoB) DrawCanvas()
-            // })
         }).catch(console.error)
 
         getVideo(URL_Player2).then(video => {
@@ -171,15 +190,9 @@ function decodeVideo() {
             videoB.addEventListener('pause', function(){
                 if (videoA && videoB) DrawCanvas()
             })
-            playerB.addEventListener('load', function(){
-                playerB.playVideo();
+            videoB.addEventListener('canplaythrough', function(){
+                setReadyElements("videoB")
             })
-            // videoB.addEventListener('canplay', function(){
-            //     if (videoA && videoB) DrawCanvas()
-            // })
-            // videoB.addEventListener('canplaythrough', function(){
-            //     if (videoA && videoB) DrawCanvas()
-            // })
         }).catch(console.error)
 
         GetTwoSounds();
@@ -206,6 +219,7 @@ function decodeVideo() {
         video.muted = true;
         video.style.visibility = "hidden"
         video.playbackRate = 1
+        setReadyElements("mainVideo")
         return video
     }
 
@@ -228,7 +242,11 @@ function decodeVideo() {
         const iframe = document.getElementById(player3[i].getIframe().id);
         iframe.onload = function () {
             video3[i] = (iframe.contentDocument || iframe.contentWindow.document).getElementsByTagName("video")[0];
-            if (video3[i]) console.log("Obtained: video3[" + i + "]"); else console.log("Failed: video3[" + i + "]");
+            if (!video3[i]){
+                console.log("Failed: video3[" + i + "]")
+                return
+            }
+            console.log("GetVideo3: " + i + " OK!")
             video3[i].index = i;
             video3[i].onwaiting = onwaitingPlayer3;
             video3[i].addEventListener("ended", function(){
@@ -238,18 +256,22 @@ function decodeVideo() {
                     ChangeToNextSound();
                 }
             })
-            if (lowPlayBackRate)
+            if (lowPlayBackRate){
                 video3[i].playbackRate = 0.07;
+            }
+            video3[i].addEventListener('canplaythrough', function(){
+                setReadyElements("video3")
+            })
         }
     }
 
     function PlayerAReady() {
-        console.log("Player 1 Ready");
+        console.log("PlayerA Ready");
         playerA.playVideo();
     }
 
     function PlayerBReady() {
-        console.log("Player 2 Ready");
+        console.log("PlayerB Ready");
         playerB.playVideo();
     }
 
@@ -517,8 +539,7 @@ function decodeVideo() {
 function setPanelContent(data) {
     const panelElement = document.querySelector("#panel")
     panelElement.innerHTML = ""
-    let key
-    let value
+    let key, value
     Object.entries(data).forEach(entrie => {
         key = entrie[0]
         value = entrie[1]
