@@ -465,6 +465,12 @@ function decodeVideo() {
             video3[soundIndex + 1].playbackRate = 0.07
 
             video3[soundIndex + 1].addEventListener('canplaythrough', function(){
+                setTimeout(() => {
+                    video3[soundIndex + 1].playbackRate = 1
+                    video3[soundIndex + 1].pause()
+                    console.log("video3[", soundIndex + 1, "] foi pausado. Esperando sua vez para despausar.")
+                    console.log("Tempo de video:", video3[soundIndex + 1].currentTime)
+                }, 2000);
                 console.log("Audio",soundIndex + 1, " canplaythrough")
                 setReadyElements("video3")
             })
@@ -491,9 +497,15 @@ function decodeVideo() {
                     ChangeToNextSound()
                 }
             })
-            video3[soundIndex + 1].playbackRate = 0.07
+            // video3[soundIndex + 1].playbackRate = 0.07
 
             video3[soundIndex + 1].addEventListener('canplaythrough', function(){
+                setTimeout(() => {
+                    video3[soundIndex + 1].playbackRate = 1
+                    video3[soundIndex + 1].pause()
+                    console.log("video3[", soundIndex + 1, "] foi pausado. Esperando sua vez para despausar.")
+                    console.log("Tempo de video:", video3[soundIndex + 1].currentTime)
+                }, 2000);
                 console.log("Audio",soundIndex + 1, " canplaythrough")
                 setReadyElements("video3")
             })
