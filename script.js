@@ -161,6 +161,7 @@ function decodeVideo() {
             })
             
             videoA.addEventListener('canplaythrough', function(){
+                console.log("VideoA canplaythrough")
                 setReadyElements("videoA")
             })
         }).catch(console.error)
@@ -180,11 +181,12 @@ function decodeVideo() {
                 if (videoA && videoB) DrawCanvas()
             })
             videoB.addEventListener('canplaythrough', function(){
+                console.log("VideoB canplaythrough")
                 setReadyElements("videoB")
             })
         }).catch(console.error)
 
-        GetTwoSounds();
+        GetTwoSounds()
     }
 
 
@@ -435,6 +437,7 @@ function decodeVideo() {
             video3[soundIndex].index = soundIndex
             video3[soundIndex].onwaiting = onwaitingPlayer3
             video3[soundIndex].addEventListener("ended", function(){
+                console.log("audio", soundIndex, "terminado")
                 if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
                     DeleteCurrentSound()
                     soundIndex = GetSoundIndex()
@@ -442,6 +445,7 @@ function decodeVideo() {
                 }
             })
             video3[soundIndex].addEventListener('canplaythrough', function(){
+                console.log("Audio",soundIndex, " canplaythrough")
                 setReadyElements("video3")
             })
         })
@@ -451,6 +455,7 @@ function decodeVideo() {
             video3[soundIndex + 1].index = soundIndex + 1
             video3[soundIndex + 1].onwaiting = onwaitingPlayer3
             video3[soundIndex + 1].addEventListener("ended", function(){
+                console.log("audio", soundIndex + 1, "terminado")
                 if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
                     DeleteCurrentSound()
                     soundIndex = GetSoundIndex()
@@ -460,6 +465,7 @@ function decodeVideo() {
             video3[soundIndex + 1].playbackRate = 0.07
 
             video3[soundIndex + 1].addEventListener('canplaythrough', function(){
+                console.log("Audio",soundIndex + 1, " canplaythrough")
                 setReadyElements("video3")
             })
         })
@@ -478,6 +484,7 @@ function decodeVideo() {
             video3[soundIndex + 1].index = soundIndex + 1
             video3[soundIndex + 1].onwaiting = onwaitingPlayer3
             video3[soundIndex + 1].addEventListener("ended", function(){
+                console.log("audio", soundIndex + 1, "terminado")
                 if (mainVideo.currentTime < tempoDeInicioP3[soundIndex + 2] || soundIndex + 1 == tempoDeInicioP3.length - 1) {
                     DeleteCurrentSound()
                     soundIndex = GetSoundIndex()
@@ -487,10 +494,12 @@ function decodeVideo() {
             video3[soundIndex + 1].playbackRate = 0.07
 
             video3[soundIndex + 1].addEventListener('canplaythrough', function(){
+                console.log("Audio",soundIndex + 1, " canplaythrough")
                 setReadyElements("video3")
             })
+            
         })
-        play();
+        play()
     }
 
     function DeleteUselessSounds(deleteAllSounds) {
