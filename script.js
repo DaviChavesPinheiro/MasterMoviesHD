@@ -425,7 +425,9 @@ function decodeVideo() {
         if (player3[soundIndex]) {
             const url = player3[soundIndex].getIframe().id;
             document.body.removeChild(document.getElementById(url));
-            player3[soundIndex] = null;
+            player3[soundIndex] = null
+            video3[soundIndex] = null
+            
         }
     }
 
@@ -521,8 +523,9 @@ function decodeVideo() {
                     if (player3[i] != null) {
                         var url = player3[i].getIframe().id;
                         try {
-                            document.body.removeChild(document.getElementById(url));
-                            player3[i] = null;
+                            document.body.removeChild(document.getElementById(url))
+                            player3[i] = null
+                            video3[soundIndex] = null
                         } catch (error) { }
                     }
                 }
