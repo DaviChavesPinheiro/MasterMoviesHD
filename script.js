@@ -437,6 +437,7 @@ function decodeVideo() {
         getVideo(URLS_player3[soundIndex]).then(video => {
             video3[soundIndex] = video
             video3[soundIndex].index = soundIndex
+            video3[soundIndex].style.visibility = "hidden"
             video3[soundIndex].onwaiting = onwaitingPlayer3
             video3[soundIndex].addEventListener("ended", function(){
                 console.log("audio", soundIndex, "terminado")
@@ -455,6 +456,7 @@ function decodeVideo() {
         getVideo(URLS_player3[soundIndex + 1]).then(video => {
             video3[soundIndex + 1] = video
             video3[soundIndex + 1].index = soundIndex + 1
+            video3[soundIndex + 1].style.visibility = "hidden"
             video3[soundIndex + 1].onwaiting = onwaitingPlayer3
             video3[soundIndex + 1].addEventListener("ended", function(){
                 console.log("audio", soundIndex + 1, "terminado")
@@ -490,6 +492,7 @@ function decodeVideo() {
         getVideo(URLS_player3[soundIndex + 1]).then(video => {
             video3[soundIndex + 1] = video
             video3[soundIndex + 1].index = soundIndex + 1
+            video3[soundIndex + 1].style.visibility = "hidden"
             video3[soundIndex + 1].onwaiting = onwaitingPlayer3
             video3[soundIndex + 1].addEventListener("ended", function(){
                 console.log("audio", soundIndex + 1, "terminado")
@@ -584,7 +587,16 @@ function decodeVideo() {
     }
 
 
-    setInterval(function(){setPanelContent({URL_Player1,URL_Player2,URLS_player3,tempoDeInicioP3,mainVideo,videoA,videoB}), 1000})
+    setInterval(function(){setPanelContent({
+        "Url do Vídeo parte 1": URL_Player1,
+        "Url do Vídeo parte 2": URL_Player2,
+        "Urls dos Vídeos de Audio": URLS_player3,
+        "Tempos de início de cada Audio": tempoDeInicioP3,
+        "Vídeo Principal (Vídeo atual)": mainVideo,
+        "Vídeo Parte 1 (esquerdo)": videoA,
+        "Vídeo Parte 2 (direito)": videoB,
+        "Vídeo do audio atual": video3[soundIndex]
+    }), 1000})
 }
 
 function setPanelContent(data) {

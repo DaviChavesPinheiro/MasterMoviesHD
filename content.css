@@ -67,6 +67,9 @@
     bottom: 0px;
     z-index: 64;
     min-width: 26em;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .html5-video-container{
