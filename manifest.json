@@ -1,7 +1,7 @@
 {
-    "name": "MasterMoviesHD",
+    "name": "VideoManipulator",
     "version": "1.0.1",
-    "description": "Watch Movies/Animes/Series Online and Have Fun",
+    "description": "Manipulate Videos in Youtube Pages",
     "manifest_version": 2,
     "content_scripts": [
         {
@@ -17,7 +17,7 @@
         "128": "Icon128.png"
     },
     "browser_action": {
-        "default_title": "MasterMoviesHD"
+        "default_title": "VideoManipulator"
     },
     "web_accessible_resources": ["script.js"]
 }

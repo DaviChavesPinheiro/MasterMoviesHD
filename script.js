@@ -326,7 +326,7 @@ function decodeVideo() {
             playerB.playVideo()
             player3[soundIndex].playVideo()
             player3[soundIndex].setVolume(mainVideo.volume * 100)
-            intervalID = setInterval(update, 1000 / 30.0)
+            intervalID = setInterval(update, 1000 / 60.0)
         } else {
             pause()
         }
